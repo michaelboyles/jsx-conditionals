@@ -1,0 +1,9 @@
+{
+    "compilerOptions":
+    {
+        "jsx": "react",
+        "plugins": [
+            { "transform": "./transforms/if-transform.ts" },
+        ]
+    }
+}
