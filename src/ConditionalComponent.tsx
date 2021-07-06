@@ -1,4 +1,5 @@
 import React = require('react');
+import { Else } from './Else';
 import { If } from './If';
 
 // TS compiler complains if expression is always true or false. This is enough to "fool" it.
@@ -18,9 +19,15 @@ export const ConditionalComponent = () => {
   return (
     <div>
       Unconditional part
-      <If condition={alwaysOne === 2}>  
-        <div>Conditional part</div>
+      <If condition={alwaysOne === 2}>
+        Conditional is true
         <ExpensiveComponent someValue={getValue()} />
+        <Else>
+          Condition is false
+        </Else>
+        <Else>
+          Condition is false (2nd)
+        </Else>
       </If>
     </div>
   );  
