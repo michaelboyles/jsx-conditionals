@@ -7,15 +7,18 @@ export default function(program: ts.Program, pluginOptions: {}) {
                 if (node.kind === ts.SyntaxKind.JsxElement) {
                     const jsxElem = node as ts.JsxElement;
                     if (jsxElem.openingElement.tagName.getText() === 'If') {
-                        return ctx.factory.createJsxExpression(
-                            undefined,
-                            ctx.factory.createConditionalExpression(
-                                getConditionExpression(jsxElem),
-                                ctx.factory.createToken(ts.SyntaxKind.QuestionToken),
-                                createWhenTrueExpression(ctx, node, jsxElem),
-                                ctx.factory.createToken(ts.SyntaxKind.ColonToken),
-                                createWhenFalseExpression(jsxElem, ctx, node)
-                            )
+                        return ts.visitEachChild(
+                            ctx.factory.createJsxExpression(
+                                undefined,
+                                ctx.factory.createConditionalExpression(
+                                    getConditionExpression(jsxElem),
+                                    ctx.factory.createToken(ts.SyntaxKind.QuestionToken),
+                                    createWhenTrueExpression(ctx, node, jsxElem),
+                                    ctx.factory.createToken(ts.SyntaxKind.ColonToken),
+                                    createWhenFalseExpression(jsxElem, ctx, node)
+                                )
+                            ),
+                            visitor, ctx
                         );
                     }
                 }

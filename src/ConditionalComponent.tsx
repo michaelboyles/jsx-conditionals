@@ -3,7 +3,8 @@ import { Else } from './Else';
 import { If } from './If';
 
 // TS compiler complains if expression is always true or false. This is enough to "fool" it.
-var alwaysOne = 1;
+var one = 1;
+var two = 2;
 
 const ExpensiveComponent = (props: {someValue: number}) => {
   return <div>{props.someValue}</div>;
@@ -19,14 +20,14 @@ export const ConditionalComponent = () => {
   return (
     <div>
       Unconditional part
-      <If condition={alwaysOne === 2}>
-        Conditional is true
+      <If condition={two === 1}>
         <ExpensiveComponent someValue={getValue()} />
         <Else>
-          Condition is false
-        </Else>
-        <Else>
-          Condition is false (2nd)
+          <If condition={one === 2}>
+            BBB
+
+            <Else>CCC</Else>
+          </If>
         </Else>
       </If>
     </div>
