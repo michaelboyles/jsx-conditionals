@@ -1,26 +1,34 @@
 import * as ts from 'typescript';
 
-export default function(program: ts.Program, pluginOptions: {}) {
+export default function(_program: ts.Program, _pluginOptions: object) {
     return (ctx: ts.TransformationContext) => {
         return (sourceFile: ts.SourceFile) => {
             function visitor(node: ts.Node): ts.Node {
-                if (node.kind === ts.SyntaxKind.JsxElement) {
-                    const jsxElem = node as ts.JsxElement;
-                    if (jsxElem.openingElement.tagName.getText() === 'If') {
-                        return ts.visitEachChild(
-                            ctx.factory.createJsxExpression(
-                                undefined,
-                                ctx.factory.createConditionalExpression(
-                                    getConditionExpression(jsxElem),
-                                    ctx.factory.createToken(ts.SyntaxKind.QuestionToken),
-                                    createWhenTrueExpression(ctx, node, jsxElem),
-                                    ctx.factory.createToken(ts.SyntaxKind.ColonToken),
-                                    createWhenFalseExpression(jsxElem, ctx, node)
-                                )
-                            ),
-                            visitor, ctx
-                        );
+                try {
+                    if (node.kind === ts.SyntaxKind.JsxElement) {
+                        const jsxElem = node as ts.JsxElement;
+                        if (jsxElem.openingElement.tagName.getText() === 'If') {
+                            return ts.visitEachChild(
+                                ctx.factory.createJsxExpression(
+                                    undefined,
+                                    ctx.factory.createConditionalExpression(
+                                        getConditionExpression(jsxElem),
+                                        ctx.factory.createToken(ts.SyntaxKind.QuestionToken),
+                                        createWhenTrueExpression(ctx, node, jsxElem),
+                                        ctx.factory.createToken(ts.SyntaxKind.ColonToken),
+                                        createWhenFalseExpression(jsxElem, ctx, node)
+                                    )
+                                ),
+                                visitor, ctx
+                            );
+                        }
                     }
+                }
+                catch (err) {
+                    if (err.message) {
+                        err.message = `${err.message}\r\nIn file ${sourceFile.fileName}\r\nAt node ${node.getText()}`;
+                    }
+                    throw err;
                 }
                 return ts.visitEachChild(node, visitor, ctx);
             }
@@ -30,33 +38,29 @@ export default function(program: ts.Program, pluginOptions: {}) {
 }
 
 function getConditionExpression(jsxElem: ts.JsxElement): ts.Expression {
+    const attrName = 'condition';
     let conditionAttr: ts.JsxAttribute = null;
 
     // forEachChild seems necessary, rather than getChildren().find() not sure why...
     jsxElem.openingElement.attributes.forEachChild(attr => {
         if (attr.kind == ts.SyntaxKind.JsxAttribute) {
             const jsxAttr = attr as ts.JsxAttribute;
-            if (jsxAttr.name.getText() === 'condition') {
+            if (jsxAttr.name.getText() === attrName) {
                 conditionAttr = jsxAttr;
+                return;
             }
         }
     });
 
     if (!conditionAttr) {
-        throw new Error("<If /> doesn't have condition attr");
+        throw new Error(`Missing '${attrName}' property`);
     }
 
     const initializer = conditionAttr.initializer;
-    if (initializer.kind === ts.SyntaxKind.StringLiteral) {
-        throw new Error('TODO');
+    if (initializer.kind !== ts.SyntaxKind.JsxExpression) {
+        throw new Error(`'${attrName}' property should be type JsxExpression, found ${ts.SyntaxKind[initializer.kind]}`);
     }
-    else if (initializer.kind === ts.SyntaxKind.JsxExpression) {
-        const initializerExpr = initializer as ts.JsxExpression;
-        return initializerExpr.expression;
-    }
-    else {
-        throw new Error('Unexpected value of JSX condition attribute for node ' + jsxElem.getText());
-    }
+    return (initializer as ts.JsxExpression).expression;
 }
 
 function createWhenTrueExpression(ctx: ts.TransformationContext, originalNode: ts.Node, jsxElem: ts.JsxElement) {
@@ -93,7 +97,7 @@ function getJsxChildren(jsxElem: ts.JsxElement) {
 
     const syntaxList = children[1];
     if (syntaxList.kind !== ts.SyntaxKind.SyntaxList) {
-        throw new Error(`Expected <${tagName} /> to contain syntax list`);
+        throw new Error(`Expected <${tagName} /> to contain SyntaxList, found ${ts.SyntaxKind[syntaxList.kind]}`);
     }
 
     const expectedTypes = [
@@ -105,7 +109,7 @@ function getJsxChildren(jsxElem: ts.JsxElement) {
         .map(child => ts.SyntaxKind[child.kind]);
 
     if (mismatches.length > 0) {
-        throw new Error("Unexpected type(s) in syntax list: " + mismatches.join(', '));
+        throw new Error('Unexpected type(s) in syntax list: ' + mismatches.join(', '));
     }
 
     // Safe cast, we checked it
