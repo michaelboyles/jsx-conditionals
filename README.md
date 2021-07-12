@@ -33,9 +33,10 @@ React.createElement(If, { condition: Boolean(someObject) },
 ```
 
 Since all of the arguments to the first `createElement` invocation must be evaluated before entering the render
-method of `<If >`, both `getFoo()` and `someObject.bar` are evaluated as well. In the former case, that's unlikely
-to be too much of a problem, but if `getFoo()` is an expensive function then it's still wasted effort. In the latter case,
-the application will throw an error, since `someObject` is falsy (i.e. undefined or null), it has no propety named `bar`.
+method of `<If >`, both `getFoo()` and `someObject.bar` are evaluated regardless of the condition as well. Calling
+`getFoo()` is unlikely to be too much of a problem unless it's expensive but it's still wasted effort. Accessing
+`someObject.bar` is worse, though. Since `someObject` may be falsy (i.e. undefined or null), trying to access `bar`
+will throw an error.
 
 ## Solution
 
