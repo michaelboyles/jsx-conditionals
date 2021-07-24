@@ -44,6 +44,17 @@ This repos demonstrates an example of using TypeScript transforms to convert ins
 into ternary expressions at compile-time. By manipulating the AST, we can achieve the expressiveness we want but without
 losing the desirable properties of short-circuiting.
 
+It's also possible to add `<Else>` clauses which would not usually be possible without a transformation.
+
+```jsx
+<If condition={isBlank}>
+    True!
+</If>
+<Else>
+    False!
+</Else>
+```
+
 ## How to run
 
 Simply install then start. A page will open in your browser.

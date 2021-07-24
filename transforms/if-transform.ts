@@ -22,6 +22,10 @@ export default function(_program: ts.Program, _pluginOptions: object) {
                                 visitor, ctx
                             );
                         }
+                        else if (jsxElem.openingElement.tagName.getText() === 'Else') {
+                            // We already processed the <Else> clause so just remove them from the AST
+                            return null;
+                        }
                     }
                 }
                 catch (err) {
@@ -118,35 +122,46 @@ function getJsxChildren(jsxElem: ts.JsxElement) {
 
 // Create the expression given after the colon (:) in the ternary
 function createWhenFalseExpression(ifJsxElem: ts.JsxElement, ctx: ts.TransformationContext, node: ts.Node): ts.Expression {
-    const elseChildren = getElseBody(ifJsxElem);
-    // TODO it may be that if there is precisely child, that we can avoid creating the fragment
-    if (elseChildren.length > 0) {
-        return ctx.factory.createJsxFragment(
-            createJsxOpeningFragment(ctx, node),
-            elseChildren,
-            ctx.factory.createJsxJsxClosingFragment()
-        );
+    if (ifJsxElem.parent.kind === ts.SyntaxKind.JsxElement) {
+        const elseChildren = getElseBody(ifJsxElem.parent as ts.JsxElement, ifJsxElem);
+        // TODO it may be that if there is precisely 1 child, that we can avoid creating the fragment
+        if (elseChildren.length > 0) {
+            return ctx.factory.createJsxFragment(
+                createJsxOpeningFragment(ctx, node),
+                elseChildren,
+                ctx.factory.createJsxJsxClosingFragment()
+            );
+        }
     }
     return ctx.factory.createNull();
 }
 
-function getElseBody(jsxElem: ts.JsxElement) {
-    const ifChildren = getJsxChildren(jsxElem);
-    const elseClauses = filterNodes<ts.JsxElement>(ts.SyntaxKind.JsxElement, ifChildren)
-        .filter(jsxNode => jsxNode.openingElement.tagName.getText() === 'Else');
-    
-    if (elseClauses.length > 0) {
-        const elseChildren: ts.JsxChild[] = [];
-        // In case they have used multiple <Else /> clauses inside one <If />
-        elseClauses.forEach(elseClause => 
-            getJsxChildren(elseClause).forEach(child => elseChildren.push(child))
-        );
-        return elseChildren;
+function getElseBody(ifParentElem: ts.JsxElement, ifElem: ts.JsxElement) {
+    const ifSiblingNodes = getJsxChildren(ifParentElem);
+    let siblingIdx = ifSiblingNodes.findIndex(child => child === ifElem);
+    if (siblingIdx < 0) {
+        throw new Error('Inexplicable error - <If>s parent does not contain it');
+    }
+
+    siblingIdx++; // Skip the <If /> itself
+    while (siblingIdx < ifSiblingNodes.length) {
+        const siblingKind = ifSiblingNodes[siblingIdx].kind;
+        if (siblingKind === ts.SyntaxKind.JsxText) {
+            const siblingText = ifSiblingNodes[siblingIdx] as ts.JsxText;
+            if (siblingText.text.trim().length === 0) {
+                siblingIdx++;
+            }
+        }
+        else if (siblingKind === ts.SyntaxKind.JsxElement) {
+            const siblingJsx = ifSiblingNodes[siblingIdx] as ts.JsxElement;
+            if (siblingJsx.openingElement.tagName.getText() === 'Else') {
+                return getJsxChildren(siblingJsx);
+            }
+            break;
+        }
+        else {
+            break;
+        }
     }
     return [];
-}
-
-// Get nodes only of a certain type from a list of nodes
-function filterNodes<T extends ts.Node>(kind: ts.SyntaxKind, nodes: ts.Node[]) {
-    return nodes.filter(node => node.kind === kind) as T[];
 }
