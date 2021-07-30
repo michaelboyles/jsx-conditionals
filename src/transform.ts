@@ -7,6 +7,10 @@ export default function(_program: ts.Program, _pluginOptions: object) {
         return (sourceFile: ts.SourceFile) => {
             function visitor(node: ts.Node): ts.Node {
                 try {
+                    if (node.kind === ts.SyntaxKind.ImportDeclaration) {
+                        const pkg = (node as ts.ImportDeclaration).moduleSpecifier as ts.StringLiteral;
+                        if (pkg.text === 'jsx-conditionals') return null; // Remove the imports
+                    }
                     if (node.kind === ts.SyntaxKind.JsxElement) {
                         const jsxElem = node as ts.JsxElement;
                         if (jsxElem.openingElement.tagName.getText() === 'If') {
