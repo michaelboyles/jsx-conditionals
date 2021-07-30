@@ -1,6 +1,5 @@
-import React = require('react');
-import { Else } from './Else';
-import { If } from './If';
+import * as React from 'react';
+import { If, Else } from '../../src';
 
 // TS compiler complains if expression is always true or false. This is enough to "fool" it.
 var one = 1;

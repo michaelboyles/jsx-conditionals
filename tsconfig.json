@@ -2,8 +2,9 @@
     "compilerOptions":
     {
         "jsx": "react",
-        "plugins": [
-            { "transform": "./transforms/if-transform.ts" },
-        ]
-    }
+        "declaration": true,
+        "outDir": "dist",
+        "removeComments": true
+    },
+    "exclude": ["dist", "node_modules"]
 }
