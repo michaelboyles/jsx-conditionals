@@ -1,0 +1,9 @@
+{
+    "compilerOptions":
+    {
+        "jsx": "react",
+        "plugins": [
+            { "transform": "./node_modules/jsx-conditionals/transform.js" },
+        ]
+    }
+}

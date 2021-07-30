@@ -1,0 +1,11 @@
+{
+    "files": ["src/index.tsx", "src/transform.ts"],
+    "compilerOptions":
+    {
+        "jsx": "react",
+        "declaration": true,
+        "outDir": "dist",
+        "removeComments": true
+    },
+    "exclude": ["dist", "node_modules"]
+}
