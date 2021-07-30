@@ -1,6 +1,6 @@
 {
-  "name": "if-jsx",
-  "version": "1.0.0",
+  "name": "jsx-conditionals",
+  "version": "0.1.0",
   "description": "Add if-else statements to JSX with TypeScript compiler transforms",
   "scripts": {
     "build": "tsc && node build/copy-to-dist.ts",
@@ -16,10 +16,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/michaelboyles/if-jsx"
+    "url": "https://github.com/michaelboyles/jsx-conditionals"
   },
   "files": [
-    "index.d.ts", "index.js", "transform.js"
+    "index.d.ts",
+    "index.js",
+    "transform.js"
   ],
   "main": "index.js",
   "types": "index.d.ts",
