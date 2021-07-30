@@ -18,6 +18,8 @@ Unlike other approaches, **jsx-conditionals** keeps the lazy evaluation of terna
 more about it [on my blog](https://boyl.es/post/add-control-flow-to-jsx/). TL;DR: it prevents some bugs and
 unnecessary function calls.
 
+Because it happens at compile-time, there's no runtime dependency at all. It's purely syntactic sugar.
+
 ## Install
 
 **jsx-conditionals** works by using TypeScript compiler transforms. Even though this is a [native TypeScript feature](https://github.com/microsoft/TypeScript-wiki/blob/master/Using-the-Compiler-API.md), it's not yet exposed publically. You need
