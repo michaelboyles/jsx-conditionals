@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Add if-else statements to JSX with TypeScript compiler transforms",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "jest"
   },
   "keywords": [
     "react",
@@ -22,11 +23,26 @@
     "react": "^17.0.2"
   },
   "devDependencies": {
+    "@types/jest": "^26.0.24",
     "@types/node": "^16.4.7",
     "@types/react": "^17.0.11",
+    "jest": "^27.0.6",
+    "react-test-renderer": "^17.0.2",
+    "ts-jest": "^27.0.4",
+    "ttypescript": "^1.5.12",
     "typescript": "^4.3.4"
   },
   "files": [
     "dist/*"
-  ]
+  ],
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "globals": {
+      "ts-jest": {
+        "compiler": "ttypescript",
+        "tsconfig": "./src/test/tsconfig-test.json"
+      }
+    }
+  }
 }
