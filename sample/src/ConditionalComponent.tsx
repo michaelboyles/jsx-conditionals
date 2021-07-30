@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { If, Else } from '../../src';
 
-const defaultUser= {
+const defaultUser = {
     profile: {
         name: 'Tom Smith'
     }
@@ -13,7 +13,7 @@ export const ConditionalComponent = () => {
     const [user, setUser] = useState<User | null>(null);
 
     return (
-        <div>
+        <>
             <h1>JSX IF sample</h1>
             <If condition={Boolean(user)}>
                 <button onClick={() => setUser(null)}>Logout</button>
@@ -23,6 +23,6 @@ export const ConditionalComponent = () => {
                 <button onClick={() => setUser(defaultUser)}>Login</button>
                 <div>Not logged in</div>
             </Else>
-        </div>
+        </>
     );  
 }

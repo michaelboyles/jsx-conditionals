@@ -1,5 +1,7 @@
 import * as ts from 'typescript';
 
+type JsxParent = ts.JsxElement | ts.JsxFragment;
+
 export default function(_program: ts.Program, _pluginOptions: object) {
     return (ctx: ts.TransformationContext) => {
         return (sourceFile: ts.SourceFile) => {
@@ -90,18 +92,16 @@ function getIfBody(jsxElem: ts.JsxElement) {
     );
 }
 
-function getJsxChildren(jsxElem: ts.JsxElement) {
-    const tagName = jsxElem.openingElement.tagName.getText();
-
-    const children = jsxElem.getChildren();
+function getJsxChildren(parent: JsxParent) {
+    const children = parent.getChildren();
     const expectedNumChildren = 3;
     if (children.length !== expectedNumChildren) {
-        throw new Error(`<${tagName} /> has ${children.length} children, expected ${expectedNumChildren}`);
+        throw new Error(`${tagToStr(parent)} has ${children.length} children, expected ${expectedNumChildren}`);
     }
 
     const syntaxList = children[1];
     if (syntaxList.kind !== ts.SyntaxKind.SyntaxList) {
-        throw new Error(`Expected <${tagName} /> to contain SyntaxList, found ${ts.SyntaxKind[syntaxList.kind]}`);
+        throw new Error(`${tagToStr(parent)} to contain SyntaxList, found ${ts.SyntaxKind[syntaxList.kind]}`);
     }
 
     const expectedTypes = [
@@ -122,8 +122,8 @@ function getJsxChildren(jsxElem: ts.JsxElement) {
 
 // Create the expression given after the colon (:) in the ternary
 function createWhenFalseExpression(ifJsxElem: ts.JsxElement, ctx: ts.TransformationContext, node: ts.Node): ts.Expression {
-    if (ifJsxElem.parent.kind === ts.SyntaxKind.JsxElement) {
-        const elseChildren = getElseBody(ifJsxElem.parent as ts.JsxElement, ifJsxElem);
+    if ([ts.SyntaxKind.JsxElement, ts.SyntaxKind.JsxFragment].includes(ifJsxElem.parent.kind)) {
+        const elseChildren = getElseBody(ifJsxElem.parent as JsxParent, ifJsxElem);
         // TODO it may be that if there is precisely 1 child, that we can avoid creating the fragment
         if (elseChildren.length > 0) {
             return ctx.factory.createJsxFragment(
@@ -136,7 +136,7 @@ function createWhenFalseExpression(ifJsxElem: ts.JsxElement, ctx: ts.Transformat
     return ctx.factory.createNull();
 }
 
-function getElseBody(ifParentElem: ts.JsxElement, ifElem: ts.JsxElement) {
+function getElseBody(ifParentElem: JsxParent, ifElem: ts.JsxElement) {
     const ifSiblingNodes = getJsxChildren(ifParentElem);
     let siblingIdx = ifSiblingNodes.findIndex(child => child === ifElem);
     if (siblingIdx < 0) {
@@ -164,4 +164,12 @@ function getElseBody(ifParentElem: ts.JsxElement, ifElem: ts.JsxElement) {
         }
     }
     return [];
+}
+
+function tagToStr(parent: JsxParent) {
+    if (parent.kind === ts.SyntaxKind.JsxElement) {
+        const jsxElem = parent as ts.JsxElement;
+        return `<${jsxElem.openingElement.tagName} />`
+    }
+    return 'fragment';
 }
