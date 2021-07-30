@@ -1,30 +1,27 @@
 import * as React from 'react';
+import { useState } from 'react';
 import { If, Else } from '../../src';
 
-// TS compiler complains if expression is always true or false. This is enough to "fool" it.
-var one = 1;
-var two = 2;
-
-const ExpensiveComponent = (props: {someValue: number}) => {
-    return <div>{props.someValue}</div>;
-};
-
-const getValue = () => {
-    const value = 5 * 5;
-    alert('Getter was evaluated, returning ' + value);
-    return value;
-}
+const defaultUser= {
+    profile: {
+        name: 'Tom Smith'
+    }
+} as const;
+type User = typeof defaultUser;
 
 export const ConditionalComponent = () => {
+    const [user, setUser] = useState<User | null>(null);
+
     return (
         <div>
-            Unconditional part
-            <If condition={two === 1}>
-                <ExpensiveComponent someValue={getValue()} />
+            <h1>JSX IF sample</h1>
+            <If condition={Boolean(user)}>
+                <button onClick={() => setUser(null)}>Logout</button>
+                <div>Logged in as {user.profile.name}</div>
             </If>
             <Else>
-                <If condition={one === 2}>BBB</If>
-                <Else>CCC</Else>
+                <button onClick={() => setUser(defaultUser)}>Login</button>
+                <div>Not logged in</div>
             </Else>
         </div>
     );  
