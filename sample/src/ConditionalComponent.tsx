@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { If, Else } from '../../src';
+import { If, Else } from 'jsx-conditionals';
 
 const defaultUser = {
     profile: {
@@ -14,7 +14,7 @@ export const ConditionalComponent = () => {
 
     return (
         <>
-            <h1>JSX IF sample</h1>
+            <h1>JSX Conditionals sample</h1>
             <If condition={Boolean(user)}>
                 <button onClick={() => setUser(null)}>Logout</button>
                 <div>Logged in as {user.profile.name}</div>

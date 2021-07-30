@@ -3,7 +3,7 @@
     {
         "jsx": "react",
         "plugins": [
-            { "transform": "../src/transform.ts" },
+            { "transform": "./node_modules/jsx-conditionals/transform.js" },
         ]
     }
 }

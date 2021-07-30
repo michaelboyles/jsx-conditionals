@@ -39,7 +39,7 @@ Then in your `tsconfig.json` add the transformation:
 {
     "compilerOptions": {
         "plugins": [
-            { "transform": "node_modules/jsx-conditionals/transform.js" },
+            { "transform": "./node_modules/jsx-conditionals/transform.js" },
         ]
     }
 }
