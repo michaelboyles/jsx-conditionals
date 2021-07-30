@@ -1,7 +1,7 @@
 {
-  "name": "jsx-if-sample",
+  "name": "if-jsx-sample",
   "version": "1.0.0",
-  "description": "Sample project for jsx-if",
+  "description": "Sample project for if-jsx",
   "private": true,
   "scripts": {
     "build": "webpack",
