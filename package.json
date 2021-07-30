@@ -3,9 +3,13 @@
   "version": "1.0.0",
   "description": "Add if-else statements to JSX with TypeScript compiler transforms",
   "scripts": {
-    "build": "ttsc src/index.tsx src/transform.ts"
+    "build": "tsc"
   },
-  "keywords": ["react", "jsx", "typescript"],
+  "keywords": [
+    "react",
+    "jsx",
+    "typescript"
+  ],
   "author": "Michael Boyles <michael@boyl.es> (https://boyl.es)",
   "license": "MIT",
   "repository": {
@@ -18,9 +22,11 @@
     "react": "^17.0.2"
   },
   "devDependencies": {
+    "@types/node": "^16.4.7",
     "@types/react": "^17.0.11",
-    "ttypescript": "1.5.12",
     "typescript": "^4.3.4"
   },
-  "files": ["dist/*"]
+  "files": [
+    "dist/*"
+  ]
 }
