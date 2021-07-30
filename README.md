@@ -1,68 +1,44 @@
-## Problem
+![Build status](https://img.shields.io/github/workflow/status/michaelboyles/if-jsx/Build%20with%20npm) ![NPM release](https://img.shields.io/npm/v/if-jsx) ![License](https://img.shields.io/github/license/michaelboyles/flamewars)
 
-Since JSX compiles to JavaScript, we are limited in what methods of control flow we can use.
-This poses a problem for React components which are rendered conditionally. Ternary expressions can be used but
-they can become difficult to format nicely if the component has a lot of props, which makes them hard to read.
-
-```jsx
-<div>{
-    Boolean(someObject) ?
-        <MyComponent
-            foo={getFoo()}
-            bar={someObject.bar}
-        /> : null
-}
-</div>
+Add `<If>` and `<Else>` to JSX using TypeScript compiler transforms. 
+    
+```javascript
+import { If, Else } from 'if-jsx';
 ```
-
-It's possible to write a wrapper component which significantly improves readability. The implementation
-is trivial. The render method evaluates the condition, and either returns the child or null depending on the result.
-
-```jsx
-<If condition={Boolean(someObject)}>
-    <MyComponent foo={getFoo()} bar={someObject.bar} />
-</If>
-```
-
-However, this has one notable problem. It's better understood by looking at the generated code:
-
-```js
-React.createElement(If, { condition: Boolean(someObject) },
-    React.createElement(MyComponent, {foo: getFoo(), bar: someObject.bar } })
-)
-```
-
-Since all of the arguments to the first `createElement` invocation must be evaluated before entering the render
-method of `<If >`, both `getFoo()` and `someObject.bar` are evaluated regardless of the condition as well. Calling
-`getFoo()` is unlikely to be too much of a problem unless it's expensive but it's still wasted effort. Accessing
-`someObject.bar` is worse, though. Since `someObject` may be falsy (i.e. undefined or null), trying to access `bar`
-will throw an error.
-
-## Solution
-
-This repos demonstrates an example of using TypeScript transforms to convert instances of `<If condition={} />`
-into ternary expressions at compile-time. By manipulating the AST, we can achieve the expressiveness we want but without
-losing the desirable properties of short-circuiting.
-
-It's also possible to add `<Else>` clauses which would not usually be possible without a transformation.
-
-```jsx
-<If condition={isBlank}>
-    True!
+```xml
+<If condition={!!foo}>
+    { foo.name }
 </If>
 <Else>
     False!
 </Else>
 ```
 
-## How to run
+Unlike other approaches, **if-jsx** keeps the lazy evaluation of ternary expressions. You can read more about
+it [on my blog](https://boyl.es/post/add-control-flow-to-jsx/). TL;DR: it prevents some bugs and unnecessary 
+function calls.
 
-Simply install then start. A page will open in your browser.
+## Install
+
+**if-jsx** works by using TypeScript compiler transforms. Even though this is a [native TypeScript feature](https://github.com/microsoft/TypeScript-wiki/blob/master/Using-the-Compiler-API.md), it's not yet exposed publically. You need
+[**ttypescript**](https://github.com/cevek/ttypescript) which is a smaller wrapper around TypeScript which exposes that feature.
 
 ```
-npm install
-npm start
+npm install --save-dev if-jsx ttypescript
 ```
 
-To remove the transform and observe the non-short-circuiting behaviour, comment out the line starting `{ "transform":` in 
-`tsconfig.json`. Now when you run `npm start`, the page will show an alert box.
+Follow [**ttypescript**'s setup](https://github.com/cevek/ttypescript#how-to-use) for the specific tools you're using. There is
+different configuration for Webpack, Rollup, Jest, etc but mostly they're just 1 or 2 lines of configuration to re-point the compiler.
+If you're confused, there's a [full sample project using Webpack](https://github.com/michaelboyles/if-jsx/tree/develop/sample).
+
+Then in your `tsconfig.json` add the transformation:
+
+```json
+{
+    "compilerOptions": {
+        "plugins": [
+            { "transform": "node_modules/if-jsx/transform.js" },
+        ]
+    }
+}
+```
