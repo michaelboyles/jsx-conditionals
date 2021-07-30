@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "Add if-else statements to JSX with TypeScript compiler transforms",
   "scripts": {
-    "build": "tsc",
-    "test": "jest"
+    "build": "tsc && node build/copy-to-dist.ts",
+    "test": "jest",
+    "prepack": "node ../build/message.ts"
   },
   "keywords": [
     "react",
@@ -17,8 +18,11 @@
     "type": "git",
     "url": "https://github.com/michaelboyles/if-jsx"
   },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "files": [
+    "index.d.ts", "index.js", "transform.js"
+  ],
+  "main": "index.js",
+  "types": "index.d.ts",
   "dependencies": {
     "react": "^17.0.2"
   },
@@ -33,9 +37,6 @@
     "ttypescript": "^1.5.12",
     "typescript": "^4.3.4"
   },
-  "files": [
-    "dist/*"
-  ],
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
