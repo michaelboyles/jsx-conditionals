@@ -12,6 +12,8 @@ exports[`Nested if 1`] = `"Both conditions are true"`;
 
 exports[`Nested if-else 1`] = `"1st condition is true but 2nd condition is false"`;
 
+exports[`Positive if 1`] = `"Condition is true"`;
+
 exports[`Positive if inside div 1`] = `
 <div>
   Condition is true
