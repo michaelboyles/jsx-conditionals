@@ -16,16 +16,15 @@ export default function(_program: ts.Program, _pluginOptions: object) {
                         checkForOrphanedElse(node as JsxParent);
                     }
                     if (isIfNode(node)) {
-                        const ifElem = node as ts.JsxElement;
                         return ts.visitEachChild(
                             ctx.factory.createJsxExpression(
                                 undefined,
                                 ctx.factory.createConditionalExpression(
-                                    getConditionExpression(ifElem),
+                                    getConditionExpression(node),
                                     ctx.factory.createToken(ts.SyntaxKind.QuestionToken),
-                                    createWhenTrueExpression(ctx, node, ifElem),
+                                    createWhenTrueExpression(ctx, node, node),
                                     ctx.factory.createToken(ts.SyntaxKind.ColonToken),
-                                    createWhenFalseExpression(ifElem, ctx, node)
+                                    createWhenFalseExpression(node, ctx, node)
                                 )
                             ),
                             visitor, ctx
@@ -33,7 +32,7 @@ export default function(_program: ts.Program, _pluginOptions: object) {
                     }
                     if (isElseNode(node)) {
                         // We already processed the <Else> clause so here we can just erase them
-                        if (!jsxParents.includes((node as ts.JsxElement).parent.kind)) {
+                        if (!jsxParents.includes(node.parent.kind)) {
                             throw new Error("<Else> is used a top-level node and has no associated <If> condition");
                         }
                         return null;
@@ -72,33 +71,26 @@ function checkForOrphanedElse(jsxParent: JsxParent) {
     });
 }
 
-function isIfNode(node: ts.Node) {
-    return node.kind === ts.SyntaxKind.JsxElement
-        && (node as ts.JsxElement).openingElement.tagName.getText() === 'If';
+function isIfNode(node: ts.Node): node is ts.JsxElement {
+    return ts.isJsxElement(node) && node.openingElement.tagName.getText() === 'If';
 } 
 
-function isElseNode(node: ts.Node) {
-    return node.kind === ts.SyntaxKind.JsxElement
-        && (node as ts.JsxElement).openingElement.tagName.getText() === 'Else';
+function isElseNode(node: ts.Node): node is ts.JsxElement {
+    return ts.isJsxElement(node) && node.openingElement.tagName.getText() === 'Else';
 }
 
 function isEmptyTextNode(node: ts.Node) {
-    return node.kind === ts.SyntaxKind.JsxText
-        && (node as ts.JsxText).text.trim().length === 0;
+    return ts.isJsxText(node) && node.text.trim().length === 0;
 }
 
 function getConditionExpression(jsxElem: ts.JsxElement): ts.Expression {
     const attrName = 'condition';
     let conditionAttr: ts.JsxAttribute = null;
 
-    // forEachChild seems necessary, rather than getChildren().find() not sure why...
     jsxElem.openingElement.attributes.forEachChild(attr => {
-        if (attr.kind == ts.SyntaxKind.JsxAttribute) {
-            const jsxAttr = attr as ts.JsxAttribute;
-            if (jsxAttr.name.getText() === attrName) {
-                conditionAttr = jsxAttr;
-                return;
-            }
+        if (ts.isJsxAttribute(attr) && attr.name.getText() === attrName) {
+            conditionAttr = attr;
+            return;
         }
     });
 
@@ -107,10 +99,10 @@ function getConditionExpression(jsxElem: ts.JsxElement): ts.Expression {
     }
 
     const initializer = conditionAttr.initializer;
-    if (initializer.kind !== ts.SyntaxKind.JsxExpression) {
+    if (!ts.isJsxExpression(initializer)) {
         throw new Error(`'${attrName}' property should be type JsxExpression, found ${ts.SyntaxKind[initializer.kind]}`);
     }
-    return (initializer as ts.JsxExpression).expression;
+    return initializer.expression;
 }
 
 function createWhenTrueExpression(ctx: ts.TransformationContext, originalNode: ts.Node, jsxElem: ts.JsxElement) {
@@ -185,7 +177,7 @@ function getElseBody(ifParentElem: JsxParent, ifElem: ts.JsxElement) {
             siblingIdx++;
         }
         else if (isElseNode(sibling)) {
-            return getJsxChildren(sibling as ts.JsxElement);
+            return getJsxChildren(sibling);
         }
         else {
             break;
@@ -195,9 +187,5 @@ function getElseBody(ifParentElem: JsxParent, ifElem: ts.JsxElement) {
 }
 
 function tagToStr(parent: JsxParent) {
-    if (parent.kind === ts.SyntaxKind.JsxElement) {
-        const jsxElem = parent as ts.JsxElement;
-        return `<${jsxElem.openingElement.tagName} />`
-    }
-    return 'fragment';
+    return ts.isJsxElement(parent) ? `<${parent.openingElement.tagName} />` : 'fragment';
 }
