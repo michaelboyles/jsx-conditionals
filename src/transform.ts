@@ -52,6 +52,7 @@ export default function(_program: ts.Program, _pluginOptions: object) {
 }
 
 function checkForOrphanedElse(jsxParent: JsxParent) {
+    const errMsg = "<Else> has no matching <If>. Only whitespace is allowed between them.";
     jsxParent.children.forEach((child, idx) => {
         if (isElseNode(child)) {
             // Found an else, now walk backwards until we find an If
@@ -65,8 +66,9 @@ function checkForOrphanedElse(jsxParent: JsxParent) {
                 if (isIfNode(sibling)) {
                     return;
                 }
+                throw new Error(errMsg);
             }
-            throw new Error("<Else> has no matching <If>. Only whitespace is allowed between them.");
+            throw new Error(errMsg);
         }
     });
 }
