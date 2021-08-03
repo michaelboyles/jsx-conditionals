@@ -1,4 +1,6 @@
-![Build status](https://img.shields.io/github/workflow/status/michaelboyles/jsx-conditionals/Build%20with%20npm) ![NPM release](https://img.shields.io/npm/v/jsx-conditionals) ![License](https://img.shields.io/github/license/michaelboyles/jsx-conditionals)
+[![Build status](https://img.shields.io/github/workflow/status/michaelboyles/jsx-conditionals/Build%20with%20npm)](https://github.com/michaelboyles/jsx-conditionals/actions)
+[![NPM release](https://img.shields.io/npm/v/jsx-conditionals)](https://www.npmjs.com/package/jsx-conditionals)
+[![License](https://img.shields.io/github/license/michaelboyles/jsx-conditionals)](https://github.com/michaelboyles/jsx-conditionals/blob/develop/LICENSE)
 
 Add `<If>` and `<Else>` to JSX using TypeScript compiler transforms. 
     
