@@ -83,7 +83,7 @@ it('Nested if-else', () => {
         .create(
             <If condition={true}>
                 <If condition={false}>{NOT_RENDERED}</If>
-                <Else>1st condition is true but 2nd condition is false</Else>
+                <Else><div>1st condition is true but 2nd condition is false</div></Else>
             </If>
         )
         .toJSON();
@@ -98,6 +98,21 @@ it('Allow whitespace between if-else', () => {
 
 
                 <Else>Condition was false</Else>
+            </>
+        )
+        .toJSON();
+    expect(tree).toMatchSnapshot();
+});
+
+it('Else with multiple children', () => {
+    const tree = renderer
+        .create(
+            <>
+                <If condition={false}>{NOT_RENDERED}</If>
+                <Else>
+                    <div>Child 1</div>
+                    <div>Child 2</div>
+                </Else>
             </>
         )
         .toJSON();

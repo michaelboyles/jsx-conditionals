@@ -22,7 +22,7 @@ export default function(_program: ts.Program, _pluginOptions: object) {
                                 ctx.factory.createConditionalExpression(
                                     getConditionExpression(node),
                                     ctx.factory.createToken(ts.SyntaxKind.QuestionToken),
-                                    createWhenTrueExpression(ctx, node, node),
+                                    createTrueFalseOperand(ctx, node, getJsxChildren(node)),
                                     ctx.factory.createToken(ts.SyntaxKind.ColonToken),
                                     createWhenFalseExpression(node, ctx, node)
                                 )
@@ -105,12 +105,25 @@ function getConditionExpression(jsxElem: ts.JsxElement): ts.Expression {
     return initializer.expression;
 }
 
-function createWhenTrueExpression(ctx: ts.TransformationContext, originalNode: ts.Node, jsxElem: ts.JsxElement) {
-    return ctx.factory.createJsxFragment(
-        createJsxOpeningFragment(ctx, originalNode),
-        getJsxChildren(jsxElem),
-        ctx.factory.createJsxJsxClosingFragment()
-    );
+function createTrueFalseOperand(ctx: ts.TransformationContext, originalNode: ts.Node, children: ts.JsxChild[]) {
+    if (children.length === 1) {
+        // This is just an optimisation to prevent creating a JSX fragment if it's not necessary
+        const child = children[0];
+        if (ts.isJsxText(child)) {
+            return ctx.factory.createStringLiteral(child.text);
+        }
+        else {
+            return child;
+        }
+    }
+    else if (children.length >= 2) {
+        return ctx.factory.createJsxFragment(
+            createJsxOpeningFragment(ctx, originalNode),
+            children,
+            ctx.factory.createJsxJsxClosingFragment()
+        );
+    }
+    return ctx.factory.createNull();
 }
 
 function createJsxOpeningFragment(ctx: ts.TransformationContext, originalNode: ts.Node) {
@@ -147,18 +160,11 @@ function getJsxChildren(parent: JsxParent) {
     return syntaxList.getChildren() as ts.JsxChild[];
 }
 
-// Create the expression given after the colon (:) in the ternary
+// Create the expression given after the colon (:) in the conditional expression
 function createWhenFalseExpression(ifJsxElem: ts.JsxElement, ctx: ts.TransformationContext, node: ts.Node): ts.Expression {
     if (jsxParents.includes(ifJsxElem.parent.kind)) {
         const elseChildren = getElseBody(ifJsxElem.parent as JsxParent, ifJsxElem);
-        // TODO it may be that if there is precisely 1 child, that we can avoid creating the fragment
-        if (elseChildren.length > 0) {
-            return ctx.factory.createJsxFragment(
-                createJsxOpeningFragment(ctx, node),
-                elseChildren,
-                ctx.factory.createJsxJsxClosingFragment()
-            );
-        }
+        return createTrueFalseOperand(ctx, node, elseChildren);
     }
     return ctx.factory.createNull();
 }
