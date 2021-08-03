@@ -8,8 +8,8 @@ export default function(_program: ts.Program, _pluginOptions: object) {
         return (sourceFile: ts.SourceFile) => {
             function visitor(node: ts.Node): ts.Node {
                 try {
-                    if (node.kind === ts.SyntaxKind.ImportDeclaration) {
-                        const pkg = (node as ts.ImportDeclaration).moduleSpecifier as ts.StringLiteral;
+                    if (ts.isImportDeclaration(node)) {
+                        const pkg = node.moduleSpecifier as ts.StringLiteral;
                         if (pkg.text === 'jsx-conditionals') return null; // Remove the imports
                     }
                     if (jsxParents.includes(node.kind)) {
