@@ -59,7 +59,7 @@ function checkForOrphanedElse(jsxParent: JsxParent) {
             let currIdx = idx - 1;
             while (currIdx >= 0) {
                 const sibling = jsxParent.children[currIdx];
-                if (isEmptyTextNode(sibling)) {
+                if (isEmptyTextNode(sibling) || isPossibleCommentNode(sibling)) {
                     currIdx--;
                     continue;
                 }
@@ -81,8 +81,15 @@ function isElseNode(node: ts.Node): node is ts.JsxElement {
     return ts.isJsxElement(node) && node.openingElement.tagName.getText() === 'Else';
 }
 
-function isEmptyTextNode(node: ts.Node) {
+function isEmptyTextNode(node: ts.Node): boolean {
     return ts.isJsxText(node) && node.text.trim().length === 0;
+}
+
+// Comments aren't included in the AST, but if the node is an empty JSX expression
+// then it's fine to assume it's probably a comment.
+function isPossibleCommentNode(node: ts.Node): boolean {
+    return ts.isJsxExpression(node)
+        && node.getChildCount() == 2; // '{' and '}'
 }
 
 function getConditionExpression(jsxElem: ts.JsxElement): ts.Expression {
@@ -181,7 +188,7 @@ function getElseBody(ifParentElem: JsxParent, ifElem: ts.JsxElement) {
     siblingIdx++; // Skip the <If /> itself
     while (siblingIdx < ifSiblingNodes.length) {
         const sibling = ifSiblingNodes[siblingIdx];
-        if (isEmptyTextNode(sibling)) {
+        if (isEmptyTextNode(sibling) || isPossibleCommentNode(sibling)) {
             siblingIdx++;
         }
         else if (isElseNode(sibling)) {

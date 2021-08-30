@@ -118,3 +118,19 @@ it('Else with multiple children', () => {
         .toJSON();
     expect(tree).toMatchSnapshot();
 });
+
+it('Else preceded by a comment', () => {
+    const tree = renderer
+        .create(
+            <>
+                <If condition={false}>{NOT_RENDERED}</If>
+                { /* This comment explains the purpose of the else */ }
+                <Else>
+                    <div>Child 1</div>
+                    <div>Child 2</div>
+                </Else>
+            </>
+        )
+        .toJSON();
+    expect(tree).toMatchSnapshot();
+});
