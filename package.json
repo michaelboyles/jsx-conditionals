@@ -4,7 +4,8 @@
   "description": "Add if-else statements to JSX with TypeScript compiler transforms",
   "scripts": {
     "build": "tsc && node build/copy-to-dist.ts",
-    "test": "jest",
+    "jest": "jest",
+    "test": "jest --clearCache && jest",
     "prepack": "node ../build/message.ts"
   },
   "keywords": [
