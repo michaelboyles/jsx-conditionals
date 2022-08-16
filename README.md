@@ -16,9 +16,11 @@ import { If, Else } from 'jsx-conditionals';
 </Else>
 ```
 
-Unlike other approaches, **jsx-conditionals** keeps the lazy evaluation of ternary expressions. You can read
-more about it [on my blog](https://boyl.es/post/add-control-flow-to-jsx/). TL;DR: it prevents some bugs and
-unnecessary function calls.
+Unlike other implementations, **jsx-conditionals** retains the lazy evaluation of ternary expressions.
+
+In a naive implementation,
+`foo.name` above would throw a '*foo is not defined*' error. This implementation only evaluates the necessary expressions.
+You can read more about it [on my blog](https://boyl.es/post/add-control-flow-to-jsx/).
 
 Because it happens at compile-time, there's no runtime dependency at all. It's purely syntactic sugar.
 
