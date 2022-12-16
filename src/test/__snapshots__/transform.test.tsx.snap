@@ -76,6 +76,8 @@ exports[`ElseIf where only If passes 1`] = `
 </div>
 `;
 
+exports[`Falsy if 1`] = `null`;
+
 exports[`If and ElseIf both pass 1`] = `
 <div>
   Child 1
@@ -121,3 +123,5 @@ exports[`Simple if-else 1`] = `
   Condition is false
 </div>
 `;
+
+exports[`Truthy if 1`] = `"Condition is true"`;

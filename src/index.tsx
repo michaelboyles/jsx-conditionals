@@ -4,7 +4,7 @@ const warning = " is a special component which is expected to be removed by tran
      "seeing this message then the transform wasn't successful";
 
 export interface IfProps {
-    condition: boolean;
+    condition: any;
     children: React.ReactNode
 }
 

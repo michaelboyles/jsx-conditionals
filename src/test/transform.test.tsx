@@ -11,6 +11,13 @@ it('Positive if', () => {
     expect(tree).toMatchSnapshot();
 });
 
+it('Truthy if', () => {
+    const tree = renderer
+        .create(<If condition={1}>Condition is true</If>)
+        .toJSON();
+    expect(tree).toMatchSnapshot();
+});
+
 it('Positive if inside fragment', () => {
     const tree = renderer
         .create(<><If condition={true}>Condition is true</If></>)
@@ -36,6 +43,13 @@ it('Positive if with evaluated condition', () => {
 it('Negative if inside div', () => {
     const tree = renderer
         .create(<div><If condition={false}>{NOT_RENDERED}</If></div>)
+        .toJSON();
+    expect(tree).toMatchSnapshot();
+});
+
+it('Falsy if', () => {
+    const tree = renderer
+        .create(<If condition={0}>{NOT_RENDERED}</If>)
         .toJSON();
     expect(tree).toMatchSnapshot();
 });
