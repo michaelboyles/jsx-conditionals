@@ -46,6 +46,8 @@ Array [
 ]
 `;
 
+exports[`Else with empty JSX expression 1`] = `null`;
+
 exports[`Else with multiple children 1`] = `
 Array [
   <div>
@@ -79,6 +81,8 @@ exports[`If and ElseIf both pass 1`] = `
   Child 1
 </div>
 `;
+
+exports[`If with empty JSX expression 1`] = `null`;
 
 exports[`Multiple ElseIfs 1`] = `
 <div>

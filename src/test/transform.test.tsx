@@ -247,3 +247,22 @@ it('Consecutive Ifs with Elses', () => {
         .toJSON();
     expect(tree).toMatchSnapshot();
 });
+
+it('If with empty JSX expression', () => {
+    const tree = renderer
+        .create(<If condition={false}>{}</If>)
+        .toJSON();
+    expect(tree).toMatchSnapshot();
+});
+
+it('Else with empty JSX expression', () => {
+    const tree = renderer
+        .create(
+            <>
+                <If condition={false}>{}</If>
+                <Else>{}</Else>
+            </>
+        )
+        .toJSON();
+    expect(tree).toMatchSnapshot();
+});

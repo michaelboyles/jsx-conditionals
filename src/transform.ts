@@ -131,24 +131,24 @@ function getConditionExpression(jsxElem: ts.JsxElement): ts.Expression {
 }
 
 function createTernaryOperand(ctx: ts.TransformationContext, originalNode: ts.Node, children: ts.JsxChild[]) {
+    if (children.length < 1) {
+        return ctx.factory.createNull();
+    }
     if (children.length === 1) {
         // This is just an optimisation to prevent creating a JSX fragment if it's not necessary
         const child = children[0];
         if (ts.isJsxText(child)) {
             return ctx.factory.createStringLiteral(child.text);
         }
-        else {
+        else if (!ts.isJsxExpression(child)) {
             return child;
         }
     }
-    else if (children.length >= 2) {
-        return ctx.factory.createJsxFragment(
-            createJsxOpeningFragment(ctx, originalNode),
-            children,
-            ctx.factory.createJsxJsxClosingFragment()
-        );
-    }
-    return ctx.factory.createNull();
+    return ctx.factory.createJsxFragment(
+        createJsxOpeningFragment(ctx, originalNode),
+        children,
+        ctx.factory.createJsxJsxClosingFragment()
+    );
 }
 
 function createJsxOpeningFragment(ctx: ts.TransformationContext, originalNode: ts.Node) {
