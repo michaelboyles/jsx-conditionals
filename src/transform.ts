@@ -131,6 +131,7 @@ function getConditionExpression(jsxElem: ts.JsxElement): ts.Expression {
 }
 
 function createTernaryOperand(ctx: ts.TransformationContext, originalNode: ts.Node, children: ts.JsxChild[]) {
+    children = children.filter(child => !ts.isJsxText(child) || !child.containsOnlyTriviaWhiteSpaces);
     if (children.length < 1) {
         return ctx.factory.createNull();
     }
