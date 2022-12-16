@@ -1,15 +1,23 @@
 import * as React from 'react';
 
+const warning = " is a special component which is expected to be removed by transform at compile-time. If you're"
+     "seeing this message then the transform wasn't successful";
+
 export interface IfProps {
     condition: boolean;
     children: React.ReactNode
 }
 
 export const If = (props: IfProps) => {
-    console.error(
-        "<If /> is a special component which is expected to be removed by transform at compile-time. If you're"
-        + "seeing this message then the transform wasn't successful"
-    );
+    console.error('<If />' + warning);
+    if (props.condition) {
+        return <>{props.children}</>;
+    }
+    return null;
+}
+
+export const ElseIf = (props: IfProps) => {
+    console.error('<ElseIf />' + warning);
     if (props.condition) {
         return <>{props.children}</>;
     }
@@ -21,9 +29,6 @@ export interface ElseProps {
 }
 
 export const Else = (props: ElseProps) => {
-    console.error(
-        "<Else /> is a special component which is expected to be removed by transform at compile-time. If you're"
-        + "seeing this message then the transform wasn't successful"
-    )
+    console.error('<Else />' + warning); 
     return <>{props.children}</>;
 }

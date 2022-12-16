@@ -2,7 +2,40 @@
 
 exports[`Allow whitespace between if-else 1`] = `"Condition was false"`;
 
+exports[`Consecutive Ifs 1`] = `
+Array [
+  <div>
+    Child 1
+  </div>,
+  <div>
+    Child 2
+  </div>,
+]
+`;
+
+exports[`Consecutive Ifs with Elses 1`] = `
+Array [
+  <div>
+    Child 1
+  </div>,
+  <div>
+    Child 2
+  </div>,
+]
+`;
+
 exports[`Else preceded by a comment 1`] = `
+Array [
+  <div>
+    Child 1
+  </div>,
+  <div>
+    Child 2
+  </div>,
+]
+`;
+
+exports[`Else where Else is used 1`] = `
 Array [
   <div>
     Child 1
@@ -22,6 +55,35 @@ Array [
     Child 2
   </div>,
 ]
+`;
+
+exports[`ElseIf where only ElseIf passes 1`] = `
+Array [
+  <div>
+    Child 1
+  </div>,
+  <div>
+    Child 2
+  </div>,
+]
+`;
+
+exports[`ElseIf where only If passes 1`] = `
+<div>
+  Child 1
+</div>
+`;
+
+exports[`If and ElseIf both pass 1`] = `
+<div>
+  Child 1
+</div>
+`;
+
+exports[`Multiple ElseIfs 1`] = `
+<div>
+  Child 1
+</div>
 `;
 
 exports[`Negative if inside div 1`] = `<div />`;
