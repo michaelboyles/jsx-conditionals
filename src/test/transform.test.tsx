@@ -1,12 +1,19 @@
 import * as React from 'react';
 import * as renderer from 'react-test-renderer';
-import { Else, If } from '..';
+import { Else, ElseIf, If } from '..';
 
 const NOT_RENDERED = 'THIS TEXT SHOULD NOT BE RENDERED!';
 
 it('Positive if', () => {
     const tree = renderer
         .create(<If condition={true}>Condition is true</If>)
+        .toJSON();
+    expect(tree).toMatchSnapshot();
+});
+
+it('Truthy if', () => {
+    const tree = renderer
+        .create(<If condition={1}>Condition is true</If>)
         .toJSON();
     expect(tree).toMatchSnapshot();
 });
@@ -36,6 +43,13 @@ it('Positive if with evaluated condition', () => {
 it('Negative if inside div', () => {
     const tree = renderer
         .create(<div><If condition={false}>{NOT_RENDERED}</If></div>)
+        .toJSON();
+    expect(tree).toMatchSnapshot();
+});
+
+it('Falsy if', () => {
+    const tree = renderer
+        .create(<If condition={0}>{NOT_RENDERED}</If>)
         .toJSON();
     expect(tree).toMatchSnapshot();
 });
@@ -129,6 +143,138 @@ it('Else preceded by a comment', () => {
                     <div>Child 1</div>
                     <div>Child 2</div>
                 </Else>
+            </>
+        )
+        .toJSON();
+    expect(tree).toMatchSnapshot();
+});
+
+it('ElseIf where only If passes', () => {
+    const tree = renderer
+        .create(
+            <>
+                <If condition={true}>
+                    <div>Child 1</div>
+                </If>
+                <ElseIf condition={false}>{NOT_RENDERED}</ElseIf>
+                <Else>{NOT_RENDERED}</Else>
+            </>
+        )
+        .toJSON();
+    expect(tree).toMatchSnapshot();
+});
+
+it('ElseIf where only ElseIf passes', () => {
+    const tree = renderer
+        .create(
+            <>
+                <If condition={false}>{NOT_RENDERED}</If>
+                <ElseIf condition={true}>
+                    <div>Child 1</div>
+                    <div>Child 2</div>
+                </ElseIf>
+                <Else>{NOT_RENDERED}</Else>
+            </>
+        )
+        .toJSON();
+    expect(tree).toMatchSnapshot();
+});
+
+it('Else where Else is used', () => {
+    const tree = renderer
+        .create(
+            <>
+                <If condition={false}>{NOT_RENDERED}</If>
+                <ElseIf condition={false}>{NOT_RENDERED}</ElseIf>
+                <Else>
+                    <div>Child 1</div>
+                    <div>Child 2</div>
+                </Else>
+            </>
+        )
+        .toJSON();
+    expect(tree).toMatchSnapshot();
+});
+
+it('Multiple ElseIfs', () => {
+    const tree = renderer
+        .create(
+            <>
+                <If condition={false}>{NOT_RENDERED}</If>
+                <ElseIf condition={false}>{NOT_RENDERED}</ElseIf>
+                <ElseIf condition={false}>{NOT_RENDERED}</ElseIf>
+                <ElseIf condition={false}>{NOT_RENDERED}</ElseIf>
+                <ElseIf condition={true}>
+                    <div>Child 1</div>
+                </ElseIf>
+                <Else>{NOT_RENDERED} </Else>
+            </>
+        )
+        .toJSON();
+    expect(tree).toMatchSnapshot();
+});
+
+it('If and ElseIf both pass', () => {
+    const tree = renderer
+        .create(
+            <>
+                <If condition={true}>
+                    <div>Child 1</div>
+                </If>
+                <ElseIf condition={true}>{NOT_RENDERED}</ElseIf>
+            </>
+        )
+        .toJSON();
+    expect(tree).toMatchSnapshot();
+});
+
+it('Consecutive Ifs', () => {
+    const tree = renderer
+        .create(
+            <>
+                <If condition={true}>
+                    <div>Child 1</div>
+                </If>
+                <If condition={true}>
+                    <div>Child 2</div>
+                </If>
+            </>
+        )
+        .toJSON();
+    expect(tree).toMatchSnapshot();
+});
+
+it('Consecutive Ifs with Elses', () => {
+    const tree = renderer
+        .create(
+            <>
+                <If condition={false}>{NOT_RENDERED}</If>
+                <Else>
+                    <div>Child 1</div>
+                </Else>
+                <If condition={false}>{NOT_RENDERED}</If>
+                <Else>
+                    <div>Child 2</div>
+                </Else>
+            </>
+        )
+        .toJSON();
+    expect(tree).toMatchSnapshot();
+});
+
+it('If with empty JSX expression', () => {
+    const tree = renderer
+        .create(<If condition={false}>{}</If>)
+        .toJSON();
+    expect(tree).toMatchSnapshot();
+});
+
+it('Else with empty JSX expression', () => {
+    const tree = renderer
+        .create(
+            <>
+                <If condition={false}>{}</If>
+                <Else>{}</Else>
             </>
         )
         .toJSON();

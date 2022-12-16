@@ -1,24 +1,29 @@
-[![Build status](https://img.shields.io/github/workflow/status/michaelboyles/jsx-conditionals/Build%20with%20npm)](https://github.com/michaelboyles/jsx-conditionals/actions)
+[![Build status](https://img.shields.io/github/actions/workflow/status/michaelboyles/jsx-conditionals/build.yml?branch=develop)](https://github.com/michaelboyles/jsx-conditionals/actions)
 [![NPM release](https://img.shields.io/npm/v/jsx-conditionals)](https://www.npmjs.com/package/jsx-conditionals)
 [![License](https://img.shields.io/github/license/michaelboyles/jsx-conditionals)](https://github.com/michaelboyles/jsx-conditionals/blob/develop/LICENSE)
 
-Add `<If>` and `<Else>` to JSX using TypeScript compiler transforms. 
+Add `<If>`, `<ElseIf>` and `<Else>` to JSX using TypeScript compiler transforms. 
     
 ```javascript
-import { If, Else } from 'jsx-conditionals';
+import { If, Else, ElseIf } from 'jsx-conditionals';
 ```
 ```xml
-<If condition={!!foo}>
-    { foo.name }
+<If condition={student}>
+    { student.name }
 </If>
+<ElseIf condition={teacher}>
+    { teacher.age }
+</ElseIf>
 <Else>
-    False!
+    Both false
 </Else>
 ```
 
-Unlike other approaches, **jsx-conditionals** keeps the lazy evaluation of ternary expressions. You can read
-more about it [on my blog](https://boyl.es/post/add-control-flow-to-jsx/). TL;DR: it prevents some bugs and
-unnecessary function calls.
+Unlike other implementations, **jsx-conditionals** retains the lazy evaluation of ternary expressions.
+
+In a naive implementation,
+`student.name` above would throw a '*student is not defined*' error. This implementation only evaluates the necessary expressions.
+You can read more about it [on my blog](https://boyl.es/post/add-control-flow-to-jsx/).
 
 Because it happens at compile-time, there's no runtime dependency at all. It's purely syntactic sugar.
 

@@ -13,28 +13,17 @@ export default function(_program: ts.Program, _pluginOptions: object) {
                         if (pkg.text === 'jsx-conditionals') return null; // Remove the imports
                     }
                     if (jsxParents.includes(node.kind)) {
-                        checkForOrphanedElse(node as JsxParent);
+                        checkForOrphanedNodes(node as JsxParent);
                     }
                     if (isIfNode(node)) {
-                        return ts.visitEachChild(
-                            ctx.factory.createJsxExpression(
-                                undefined,
-                                ctx.factory.createConditionalExpression(
-                                    getConditionExpression(node),
-                                    ctx.factory.createToken(ts.SyntaxKind.QuestionToken),
-                                    createTrueFalseOperand(ctx, node, getJsxChildren(node)),
-                                    ctx.factory.createToken(ts.SyntaxKind.ColonToken),
-                                    createWhenFalseExpression(node, ctx, node)
-                                )
-                            ),
-                            visitor, ctx
-                        );
+                        return ts.visitEachChild(createTernary(ctx, node), visitor, ctx);
                     }
-                    if (isElseNode(node)) {
-                        // We already processed the <Else> clause so here we can just erase them
+                    if (isElseNode(node) || isElseIfNode(node)) {
+                        // Top-level case only
                         if (!jsxParents.includes(node.parent.kind)) {
-                            throw new Error("<Else> is used a top-level node and has no associated <If> condition");
+                            throw new Error(nodeToString(node) + " is used a top-level node and has no associated <If> condition");
                         }
+                        // We already processed the <Else> and <ElseIf> clauses so here we can just erase them
                         return null;
                     }
                 }
@@ -51,11 +40,27 @@ export default function(_program: ts.Program, _pluginOptions: object) {
     };
 }
 
-function checkForOrphanedElse(jsxParent: JsxParent) {
-    const errMsg = "<Else> has no matching <If>. Only whitespace is allowed between them.";
+function createTernary(ctx: ts.TransformationContext, prevBranch: ts.JsxElement) {
+    return ctx.factory.createJsxExpression(
+        undefined,
+        ctx.factory.createConditionalExpression(
+            getConditionExpression(prevBranch),
+            ctx.factory.createToken(ts.SyntaxKind.QuestionToken),
+            createTernaryOperand(ctx, prevBranch, getJsxChildren(prevBranch)),
+            ctx.factory.createToken(ts.SyntaxKind.ColonToken),
+            createWhenFalseExpression(prevBranch, ctx, prevBranch)
+        )
+    );
+}
+
+function checkForOrphanedNodes(jsxParent: JsxParent) {
+    const errMsg = " has no matching <If> or <ElseIf>. Only whitespace is allowed between them.";
+
     jsxParent.children.forEach((child, idx) => {
-        if (isElseNode(child)) {
-            // Found an else, now walk backwards until we find an If
+        const isElse = isElseNode(child);
+        const isElseIf = isElseIfNode(child);
+        if (isElse || isElseIf) {
+            // Found an Else or ElseIf, now walk backwards until we find an If or ElseIf
             let currIdx = idx - 1;
             while (currIdx >= 0) {
                 const sibling = jsxParent.children[currIdx];
@@ -63,12 +68,12 @@ function checkForOrphanedElse(jsxParent: JsxParent) {
                     currIdx--;
                     continue;
                 }
-                if (isIfNode(sibling)) {
+                if (isIfNode(sibling) || isElseIfNode(sibling)) {
                     return;
                 }
-                throw new Error(errMsg);
+                throw Error(nodeToString(child) + errMsg);
             }
-            throw new Error(errMsg);
+            throw Error(nodeToString(child) + errMsg);
         }
     });
 }
@@ -77,12 +82,23 @@ function isIfNode(node: ts.Node): node is ts.JsxElement {
     return ts.isJsxElement(node) && node.openingElement.tagName.getText() === 'If';
 } 
 
+function isElseIfNode(node: ts.Node): node is ts.JsxElement {
+    return ts.isJsxElement(node) && node.openingElement.tagName.getText() === 'ElseIf';
+}
+
 function isElseNode(node: ts.Node): node is ts.JsxElement {
     return ts.isJsxElement(node) && node.openingElement.tagName.getText() === 'Else';
 }
 
 function isEmptyTextNode(node: ts.Node): boolean {
     return ts.isJsxText(node) && node.text.trim().length === 0;
+}
+
+function nodeToString(node: ts.Node): string {
+    if (isIfNode(node)) return '<If>';
+    if (isElseIfNode(node)) return '<ElseIf>';
+    if (isElseNode(node)) return '<Else>';
+    throw Error('Unknown node');
 }
 
 // Comments aren't included in the AST, but if the node is an empty JSX expression
@@ -114,25 +130,26 @@ function getConditionExpression(jsxElem: ts.JsxElement): ts.Expression {
     return initializer.expression;
 }
 
-function createTrueFalseOperand(ctx: ts.TransformationContext, originalNode: ts.Node, children: ts.JsxChild[]) {
+function createTernaryOperand(ctx: ts.TransformationContext, originalNode: ts.Node, children: ts.JsxChild[]) {
+    children = children.filter(child => !ts.isJsxText(child) || !child.containsOnlyTriviaWhiteSpaces);
+    if (children.length < 1) {
+        return ctx.factory.createNull();
+    }
     if (children.length === 1) {
         // This is just an optimisation to prevent creating a JSX fragment if it's not necessary
         const child = children[0];
         if (ts.isJsxText(child)) {
             return ctx.factory.createStringLiteral(child.text);
         }
-        else {
+        else if (!ts.isJsxExpression(child)) {
             return child;
         }
     }
-    else if (children.length >= 2) {
-        return ctx.factory.createJsxFragment(
-            createJsxOpeningFragment(ctx, originalNode),
-            children,
-            ctx.factory.createJsxJsxClosingFragment()
-        );
-    }
-    return ctx.factory.createNull();
+    return ctx.factory.createJsxFragment(
+        createJsxOpeningFragment(ctx, originalNode),
+        children,
+        ctx.factory.createJsxJsxClosingFragment()
+    );
 }
 
 function createJsxOpeningFragment(ctx: ts.TransformationContext, originalNode: ts.Node) {
@@ -170,35 +187,43 @@ function getJsxChildren(parent: JsxParent) {
 }
 
 // Create the expression given after the colon (:) in the conditional expression
-function createWhenFalseExpression(ifJsxElem: ts.JsxElement, ctx: ts.TransformationContext, node: ts.Node): ts.Expression {
-    if (jsxParents.includes(ifJsxElem.parent.kind)) {
-        const elseChildren = getElseBody(ifJsxElem.parent as JsxParent, ifJsxElem);
-        return createTrueFalseOperand(ctx, node, elseChildren);
+function createWhenFalseExpression(prevBranch: ts.JsxElement, ctx: ts.TransformationContext, node: ts.Node): ts.Expression {
+    if (jsxParents.includes(prevBranch.parent.kind)) {
+        const nextBranch = getNextBranch(prevBranch.parent as JsxParent, prevBranch);
+        if (nextBranch) {
+            if (isElseIfNode(nextBranch)) {
+                return createTernary(ctx, nextBranch);
+            }
+            else if (isElseNode(nextBranch)) {
+                const elseChildren = getJsxChildren(nextBranch)
+                return createTernaryOperand(ctx, node, elseChildren);
+            }
+        }
     }
     return ctx.factory.createNull();
 }
 
-function getElseBody(ifParentElem: JsxParent, ifElem: ts.JsxElement) {
-    const ifSiblingNodes = getJsxChildren(ifParentElem);
-    let siblingIdx = ifSiblingNodes.findIndex(child => child === ifElem);
+function getNextBranch(prevBranch: JsxParent, ifElem: ts.JsxElement) {
+    const siblingNodes = getJsxChildren(prevBranch);
+    let siblingIdx = siblingNodes.findIndex(child => child === ifElem);
     if (siblingIdx < 0) {
         throw new Error('Inexplicable error - <If>s parent does not contain it');
     }
 
     siblingIdx++; // Skip the <If /> itself
-    while (siblingIdx < ifSiblingNodes.length) {
-        const sibling = ifSiblingNodes[siblingIdx];
+    while (siblingIdx < siblingNodes.length) {
+        const sibling = siblingNodes[siblingIdx];
         if (isEmptyTextNode(sibling) || isPossibleCommentNode(sibling)) {
             siblingIdx++;
         }
-        else if (isElseNode(sibling)) {
-            return getJsxChildren(sibling);
+        else if (isElseNode(sibling) || isElseIfNode(sibling)) {
+            return sibling;
         }
         else {
             break;
         }
     }
-    return [];
+    return undefined;
 }
 
 function tagToStr(parent: JsxParent) {

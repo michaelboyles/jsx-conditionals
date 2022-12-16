@@ -2,6 +2,28 @@
 
 exports[`Allow whitespace between if-else 1`] = `"Condition was false"`;
 
+exports[`Consecutive Ifs 1`] = `
+Array [
+  <div>
+    Child 1
+  </div>,
+  <div>
+    Child 2
+  </div>,
+]
+`;
+
+exports[`Consecutive Ifs with Elses 1`] = `
+Array [
+  <div>
+    Child 1
+  </div>,
+  <div>
+    Child 2
+  </div>,
+]
+`;
+
 exports[`Else preceded by a comment 1`] = `
 Array [
   <div>
@@ -13,6 +35,19 @@ Array [
 ]
 `;
 
+exports[`Else where Else is used 1`] = `
+Array [
+  <div>
+    Child 1
+  </div>,
+  <div>
+    Child 2
+  </div>,
+]
+`;
+
+exports[`Else with empty JSX expression 1`] = `null`;
+
 exports[`Else with multiple children 1`] = `
 Array [
   <div>
@@ -22,6 +57,39 @@ Array [
     Child 2
   </div>,
 ]
+`;
+
+exports[`ElseIf where only ElseIf passes 1`] = `
+Array [
+  <div>
+    Child 1
+  </div>,
+  <div>
+    Child 2
+  </div>,
+]
+`;
+
+exports[`ElseIf where only If passes 1`] = `
+<div>
+  Child 1
+</div>
+`;
+
+exports[`Falsy if 1`] = `null`;
+
+exports[`If and ElseIf both pass 1`] = `
+<div>
+  Child 1
+</div>
+`;
+
+exports[`If with empty JSX expression 1`] = `null`;
+
+exports[`Multiple ElseIfs 1`] = `
+<div>
+  Child 1
+</div>
 `;
 
 exports[`Negative if inside div 1`] = `<div />`;
@@ -55,3 +123,5 @@ exports[`Simple if-else 1`] = `
   Condition is false
 </div>
 `;
+
+exports[`Truthy if 1`] = `"Condition is true"`;
