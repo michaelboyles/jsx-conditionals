@@ -1,4 +1,4 @@
-[![Build status](https://img.shields.io/github/workflow/status/michaelboyles/jsx-conditionals/Build%20with%20npm)](https://github.com/michaelboyles/jsx-conditionals/actions)
+[![Build status](https://img.shields.io/github/actions/workflow/status/michaelboyles/jsx-conditionals/build.yml?branch=develop)](https://github.com/michaelboyles/jsx-conditionals/actions)
 [![NPM release](https://img.shields.io/npm/v/jsx-conditionals)](https://www.npmjs.com/package/jsx-conditionals)
 [![License](https://img.shields.io/github/license/michaelboyles/jsx-conditionals)](https://github.com/michaelboyles/jsx-conditionals/blob/develop/LICENSE)
 
