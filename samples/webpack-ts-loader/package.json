@@ -1,0 +1,28 @@
+{
+  "name": "jsx-conditionals-sample",
+  "version": "1.0.0",
+  "description": "Sample project for jsx-conditionals",
+  "private": true,
+  "scripts": {
+    "build": "webpack",
+    "start": "webpack serve --mode development --open --hot"
+  },
+  "author": "Michael Boyles",
+  "license": "MIT",
+  "dependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.14.9",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "html-webpack-plugin": "5.6.0",
+    "jsx-conditionals": "1.1.0",
+    "ts-loader": "9.5.1",
+    "typescript": "5.5.3",
+    "webpack": "5.92.1",
+    "webpack-cli": "5.1.4",
+    "webpack-dev-server": "5.0.4"
+  }
+}

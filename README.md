@@ -29,18 +29,53 @@ Because it happens at compile-time, there's no runtime dependency at all. It's p
 
 ## Install
 
-**jsx-conditionals** works by using TypeScript compiler transforms. Even though this is a [native TypeScript feature](https://github.com/microsoft/TypeScript-wiki/blob/master/Using-the-Compiler-API.md), it's not yet exposed publically. You need
-[**ttypescript**](https://github.com/cevek/ttypescript) which is a smaller wrapper around TypeScript which exposes that feature.
-
-```
-npm install --save-dev jsx-conditionals ttypescript
+```text
+npm install --save-dev jsx-conditionals
 ```
 
-Follow [**ttypescript**'s setup](https://github.com/cevek/ttypescript#how-to-use) for the specific tools you're using. There is
-different configuration for Webpack, Rollup, Jest, etc but mostly they're just 1 or 2 lines of configuration to re-point the compiler.
-If you're confused, there's a [full sample project using Webpack](https://github.com/michaelboyles/jsx-conditionals/tree/develop/sample).
+**jsx-conditionals** works by using TypeScript compiler transforms. Even though it's a [native TypeScript feature](https://github.com/microsoft/TypeScript-wiki/blob/master/Using-the-Compiler-API.md),
+it's only exposed via API. In the future, this may be as simple as [an entry in your `tsconfig`](https://github.com/microsoft/TypeScript/issues/54276).
+For now, setup will depend on your build system.
 
-Then in your `tsconfig.json` add the transformation:
+If you're not using the typescript compiler (e.g. Vite (and so esbuild) or Next.js (and so SWC)), then it's not possible.
+
+<details>
+    <summary>Webpack and ts-loader</summary>
+
+Configure your `webpack.config`
+
+```js
+const jsxConditionals = require('jsx-conditionals/transform').default;
+//...
+module.exports = {
+    //...
+    module: {
+        rules: [
+            {
+                test: /\.tsx?$/,
+                use: [{
+                    loader: 'ts-loader',
+                    options: {
+                        getCustomTransformers: (program) => ({
+                            before: [jsxConditionals(program, {})]
+                        })
+                    }
+                }]
+            }
+        ]
+    }
+}
+
+See the [Webpack and ts-loader sample](https://github.com/michaelboyles/jsx-conditionals/tree/develop/samples/webpack-ts-loader).
+```
+</details>
+
+<details>
+    <summary>ts-patch</summary>
+    
+    Follow the [ts-patch installation/usage steps](https://github.com/nonara/ts-patch?tab=readme-ov-file#installation)
+
+    You can now add this entry in your `tsconfig.json`.
 
 ```json
 {
@@ -51,3 +86,5 @@ Then in your `tsconfig.json` add the transformation:
     }
 }
 ```
+</details>
+
