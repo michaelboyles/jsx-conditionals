@@ -65,17 +65,17 @@ module.exports = {
         ]
     }
 }
+```
 
 See the [Webpack and ts-loader sample](https://github.com/michaelboyles/jsx-conditionals/tree/develop/samples/webpack-ts-loader).
-```
 </details>
 
 <details>
     <summary>ts-patch</summary>
     
-    Follow the [ts-patch installation/usage steps](https://github.com/nonara/ts-patch?tab=readme-ov-file#installation)
+Follow the [ts-patch installation/usage steps](https://github.com/nonara/ts-patch?tab=readme-ov-file#installation)
 
-    You can now add this entry in your `tsconfig.json`.
+You can now add this entry in your `tsconfig.json`.
 
 ```json
 {
