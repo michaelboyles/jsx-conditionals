@@ -1,7 +1,10 @@
 import * as ts from 'typescript';
 
 type JsxParent = ts.JsxElement | ts.JsxFragment;
-const jsxParents = [ts.SyntaxKind.JsxElement, ts.SyntaxKind.JsxFragment];
+function isJsxParent(node: ts.Node): node is JsxParent {
+    return node.kind === ts.SyntaxKind.JsxElement
+        || node.kind === ts.SyntaxKind.JsxFragment
+}
 
 export default function(_program: ts.Program, _pluginOptions: object) {
     return (ctx: ts.TransformationContext) => {
@@ -12,15 +15,15 @@ export default function(_program: ts.Program, _pluginOptions: object) {
                         const pkg = node.moduleSpecifier as ts.StringLiteral;
                         if (pkg.text === 'jsx-conditionals') return null; // Remove the imports
                     }
-                    if (jsxParents.includes(node.kind)) {
-                        checkForOrphanedNodes(node as JsxParent);
+                    if (isJsxParent(node)) {
+                        checkForOrphanedNodes(node);
                     }
                     if (isIfNode(node)) {
                         return ts.visitEachChild(createTernary(ctx, node), visitor, ctx);
                     }
                     if (isElseNode(node) || isElseIfNode(node)) {
                         // Top-level case only
-                        if (!jsxParents.includes(node.parent.kind)) {
+                        if (!isJsxParent(node.parent)) {
                             throw new Error(nodeToString(node) + " is used a top-level node and has no associated <If> condition");
                         }
                         // We already processed the <Else> and <ElseIf> clauses so here we can just erase them
@@ -188,8 +191,8 @@ function getJsxChildren(parent: JsxParent) {
 
 // Create the expression given after the colon (:) in the conditional expression
 function createWhenFalseExpression(prevBranch: ts.JsxElement, ctx: ts.TransformationContext, node: ts.Node): ts.Expression {
-    if (jsxParents.includes(prevBranch.parent.kind)) {
-        const nextBranch = getNextBranch(prevBranch.parent as JsxParent, prevBranch);
+    if (isJsxParent(prevBranch.parent)) {
+        const nextBranch = getNextBranch(prevBranch.parent, prevBranch);
         if (nextBranch) {
             if (isElseIfNode(nextBranch)) {
                 return createTernary(ctx, nextBranch);
