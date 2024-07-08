@@ -164,7 +164,13 @@ export default function({ types: t }: Bable): PluginObj {
             JSXElement(path) {
                 checkForOrphanedNodes(path);
                 if (isIfNode(path.node)) {
-                    path.replaceWith(t.jsxExpressionContainer(createTernary(path)))
+                    const ternary = createTernary(path);
+                    if (isJsxParent(path.parent)) {
+                        path.replaceWith(t.jsxExpressionContainer(ternary));
+                    }
+                    else {
+                        path.replaceWith(ternary);
+                    }
                 }
                 else if (isElseNode(path.node) || isElseIfNode(path.node)) {
                     // We already processed the <Else> and <ElseIf> clauses so here we can just erase them
