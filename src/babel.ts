@@ -95,8 +95,7 @@ export default function({ types: t }: Bable): PluginObj {
         if (conditionAttr.type !== 'JSXAttribute') throw new Error("Impossible");
 
         if (conditionAttr.value.type !== 'JSXExpressionContainer') {
-            // TODO I think this (incorrectly?) throws if you do things like condition="hello" or condition=<Foo />. But
-            throw new Error(`'${attrName}' property should be type JSXExpressionContainer, found ${conditionAttr.value.type}`);
+            return conditionAttr.value;
         }
         if (conditionAttr.value.expression.type === 'JSXEmptyExpression') {
             return t.booleanLiteral(true); // Not sure about it
