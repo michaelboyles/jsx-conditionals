@@ -18,4 +18,11 @@ jobs:
         node-version: 20
     - run: npm ci
     - run: npm run build
-    - run: npm run test
+    - run: npm ci
+      working-directory: test/babel
+    - run: npm test
+      working-directory: test/babel
+    - run: npm ci
+      working-directory: test/ts-jest
+    - run: npm test
+      working-directory: test/ts-jest
