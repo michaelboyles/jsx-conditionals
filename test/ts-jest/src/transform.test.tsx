@@ -280,3 +280,11 @@ it('Else with empty JSX expression', () => {
         .toJSON();
     expect(tree).toMatchSnapshot();
 });
+
+// It's dumb and I see no reason to do it, but it is a valid truthy value
+it('If with string literal condition', () => {
+    const tree = renderer
+        .create(<If condition="true">Condition is true</If>)
+        .toJSON();
+    expect(tree).toMatchSnapshot();
+});

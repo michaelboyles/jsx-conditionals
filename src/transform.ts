@@ -127,10 +127,10 @@ function getConditionExpression(jsxElem: ts.JsxElement): ts.Expression {
     }
 
     const initializer = conditionAttr.initializer;
-    if (!ts.isJsxExpression(initializer)) {
-        throw new Error(`'${attrName}' property should be type JsxExpression, found ${ts.SyntaxKind[initializer.kind]}`);
+    if (ts.isJsxExpression(initializer)) {
+        return initializer.expression;
     }
-    return initializer.expression;
+    return initializer;
 }
 
 function createTernaryOperand(ctx: ts.TransformationContext, originalNode: ts.Node, children: ts.JsxChild[]) {
