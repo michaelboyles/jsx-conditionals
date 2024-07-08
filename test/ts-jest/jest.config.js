@@ -3,15 +3,16 @@ const config = {
     preset: 'ts-jest',
     testEnvironment: 'node',
     verbose: true,
-    globals: {
-        "ts-jest": {
+    transform: {
+        ".*": ["ts-jest", {
             astTransformers: {
                 before: [
                     { path: './jest-factory.js' },
                 ],
             },
-        },
-        tsconfig: "./src/test/tsconfig-test.json"
+            // Prevents some type errors
+            isolatedModules: true
+        }]
     }
 };
 

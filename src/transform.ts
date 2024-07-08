@@ -142,7 +142,7 @@ function createTernaryOperand(ctx: ts.TransformationContext, originalNode: ts.No
         // This is just an optimisation to prevent creating a JSX fragment if it's not necessary
         const child = children[0];
         if (ts.isJsxText(child)) {
-            return ctx.factory.createStringLiteral(child.text);
+            return ctx.factory.createStringLiteral(child.text); // TODO maybe trim
         }
         else if (!ts.isJsxExpression(child)) {
             return child;

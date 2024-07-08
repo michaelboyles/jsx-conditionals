@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as renderer from 'react-test-renderer';
-import { Else, ElseIf, If } from '..';
+import { Else, ElseIf, If } from '../../../src';
 
 const NOT_RENDERED = 'THIS TEXT SHOULD NOT BE RENDERED!';
 
