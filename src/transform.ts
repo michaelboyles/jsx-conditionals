@@ -1,25 +1,44 @@
-import * as ts from 'typescript';
+import {
+    Expression,
+    isImportDeclaration,
+    isJsxAttribute,
+    isJsxElement,
+    isJsxExpression,
+    isJsxText,
+    JsxAttribute,
+    JsxChild,
+    JsxElement,
+    JsxFragment,
+    Node,
+    Program,
+    setOriginalNode,
+    SourceFile,
+    StringLiteral,
+    SyntaxKind,
+    TransformationContext,
+    visitEachChild
+} from 'typescript';
 
-type JsxParent = ts.JsxElement | ts.JsxFragment;
-function isJsxParent(node: ts.Node): node is JsxParent {
-    return node.kind === ts.SyntaxKind.JsxElement
-        || node.kind === ts.SyntaxKind.JsxFragment
+type JsxParent = JsxElement | JsxFragment;
+function isJsxParent(node: Node): node is JsxParent {
+    return node.kind === SyntaxKind.JsxElement
+        || node.kind === SyntaxKind.JsxFragment
 }
 
-export default function(_program: ts.Program, _pluginOptions: object) {
-    return (ctx: ts.TransformationContext) => {
-        return (sourceFile: ts.SourceFile) => {
-            function visitor(node: ts.Node): ts.Node | undefined {
+export default function(_program: Program, _pluginOptions: object) {
+    return (ctx: TransformationContext) => {
+        return (sourceFile: SourceFile) => {
+            function visitor(node: Node): Node | undefined {
                 try {
-                    if (ts.isImportDeclaration(node)) {
-                        const pkg = node.moduleSpecifier as ts.StringLiteral;
+                    if (isImportDeclaration(node)) {
+                        const pkg = node.moduleSpecifier as StringLiteral;
                         if (pkg.text === 'jsx-conditionals') return undefined; // Remove the imports
                     }
                     if (isJsxParent(node)) {
                         checkForOrphanedNodes(node);
                     }
                     if (isIfNode(node)) {
-                        return ts.visitEachChild(createTernary(ctx, node), visitor, ctx);
+                        return visitEachChild(createTernary(ctx, node), visitor, ctx);
                     }
                     if (isElseNode(node) || isElseIfNode(node)) {
                         // Top-level case only
@@ -36,21 +55,21 @@ export default function(_program: ts.Program, _pluginOptions: object) {
                     }
                     throw err;
                 }
-                return ts.visitEachChild(node, visitor, ctx);
+                return visitEachChild(node, visitor, ctx);
             }
-            return ts.visitEachChild(sourceFile, visitor, ctx);
+            return visitEachChild(sourceFile, visitor, ctx);
         };
     };
 }
 
-function createTernary(ctx: ts.TransformationContext, prevBranch: ts.JsxElement) {
+function createTernary(ctx: TransformationContext, prevBranch: JsxElement) {
     return ctx.factory.createJsxExpression(
         undefined,
         ctx.factory.createConditionalExpression(
             getConditionExpression(ctx, prevBranch),
-            ctx.factory.createToken(ts.SyntaxKind.QuestionToken),
+            ctx.factory.createToken(SyntaxKind.QuestionToken),
             createTernaryOperand(ctx, prevBranch, getJsxChildren(prevBranch)),
-            ctx.factory.createToken(ts.SyntaxKind.ColonToken),
+            ctx.factory.createToken(SyntaxKind.ColonToken),
             createWhenFalseExpression(prevBranch, ctx, prevBranch)
         )
     );
@@ -81,23 +100,23 @@ function checkForOrphanedNodes(jsxParent: JsxParent) {
     });
 }
 
-function isIfNode(node: ts.Node): node is ts.JsxElement {
-    return ts.isJsxElement(node) && node.openingElement.tagName.getText() === 'If';
+function isIfNode(node: Node): node is JsxElement {
+    return isJsxElement(node) && node.openingElement.tagName.getText() === 'If';
 } 
 
-function isElseIfNode(node: ts.Node): node is ts.JsxElement {
-    return ts.isJsxElement(node) && node.openingElement.tagName.getText() === 'ElseIf';
+function isElseIfNode(node: Node): node is JsxElement {
+    return isJsxElement(node) && node.openingElement.tagName.getText() === 'ElseIf';
 }
 
-function isElseNode(node: ts.Node): node is ts.JsxElement {
-    return ts.isJsxElement(node) && node.openingElement.tagName.getText() === 'Else';
+function isElseNode(node: Node): node is JsxElement {
+    return isJsxElement(node) && node.openingElement.tagName.getText() === 'Else';
 }
 
-function isEmptyTextNode(node: ts.Node): boolean {
-    return ts.isJsxText(node) && node.text.trim().length === 0;
+function isEmptyTextNode(node: Node): boolean {
+    return isJsxText(node) && node.text.trim().length === 0;
 }
 
-function nodeToString(node: ts.Node): string {
+function nodeToString(node: Node): string {
     if (isIfNode(node)) return '<If>';
     if (isElseIfNode(node)) return '<ElseIf>';
     if (isElseNode(node)) return '<Else>';
@@ -106,17 +125,17 @@ function nodeToString(node: ts.Node): string {
 
 // Comments aren't included in the AST, but if the node is an empty JSX expression
 // then it's fine to assume it's probably a comment.
-function isPossibleCommentNode(node: ts.Node): boolean {
-    return ts.isJsxExpression(node)
+function isPossibleCommentNode(node: Node): boolean {
+    return isJsxExpression(node)
         && node.getChildCount() == 2; // '{' and '}'
 }
 
-function getConditionExpression(ctx: ts.TransformationContext, jsxElem: ts.JsxElement): ts.Expression {
+function getConditionExpression(ctx: TransformationContext, jsxElem: JsxElement): Expression {
     const attrName = 'condition';
-    let conditionAttr: (ts.JsxAttribute | null) = null;
+    let conditionAttr: (JsxAttribute | null) = null;
 
     jsxElem.openingElement.attributes.forEachChild(attr => {
-        if (ts.isJsxAttribute(attr) && attr.name.getText() === attrName) {
+        if (isJsxAttribute(attr) && attr.name.getText() === attrName) {
             conditionAttr = attr;
             return;
         }
@@ -126,31 +145,31 @@ function getConditionExpression(ctx: ts.TransformationContext, jsxElem: ts.JsxEl
         throw new Error(`Missing '${attrName}' property`);
     }
 
-    const initializer = (conditionAttr as (ts.JsxAttribute)).initializer;
+    const initializer = (conditionAttr as (JsxAttribute)).initializer;
     if (!initializer) {
-        return ctx.factory.createToken(ts.SyntaxKind.TrueKeyword);
+        return ctx.factory.createToken(SyntaxKind.TrueKeyword);
     }
-    if (ts.isJsxExpression(initializer)) {
+    if (isJsxExpression(initializer)) {
         if (!initializer.expression) {
-            return ctx.factory.createToken(ts.SyntaxKind.TrueKeyword);
+            return ctx.factory.createToken(SyntaxKind.TrueKeyword);
         }
         return initializer.expression;
     }
     return initializer;
 }
 
-function createTernaryOperand(ctx: ts.TransformationContext, originalNode: ts.Node, children: ts.JsxChild[]) {
-    children = children.filter(child => !ts.isJsxText(child) || !child.containsOnlyTriviaWhiteSpaces);
+function createTernaryOperand(ctx: TransformationContext, originalNode: Node, children: JsxChild[]) {
+    children = children.filter(child => !isJsxText(child) || !child.containsOnlyTriviaWhiteSpaces);
     if (children.length < 1) {
         return ctx.factory.createNull();
     }
     if (children.length === 1) {
         // This is just an optimisation to prevent creating a JSX fragment if it's not necessary
         const child = children[0];
-        if (ts.isJsxText(child)) {
+        if (isJsxText(child)) {
             return ctx.factory.createStringLiteral(child.text); // TODO maybe trim
         }
-        else if (!ts.isJsxExpression(child)) {
+        else if (!isJsxExpression(child)) {
             return child;
         }
     }
@@ -161,9 +180,9 @@ function createTernaryOperand(ctx: ts.TransformationContext, originalNode: ts.No
     );
 }
 
-function createJsxOpeningFragment(ctx: ts.TransformationContext, originalNode: ts.Node) {
+function createJsxOpeningFragment(ctx: TransformationContext, originalNode: Node) {
     const openingFrag = ctx.factory.createJsxOpeningFragment();
-    ts.setOriginalNode(openingFrag, originalNode); // https://github.com/microsoft/TypeScript/issues/35686
+    setOriginalNode(openingFrag, originalNode); // https://github.com/microsoft/TypeScript/issues/35686
     return openingFrag;
 }
 
@@ -175,28 +194,28 @@ function getJsxChildren(parent: JsxParent) {
     }
 
     const syntaxList = children[1];
-    if (syntaxList.kind !== ts.SyntaxKind.SyntaxList) {
-        throw new Error(`${tagToStr(parent)} to contain SyntaxList, found ${ts.SyntaxKind[syntaxList.kind]}`);
+    if (syntaxList.kind !== SyntaxKind.SyntaxList) {
+        throw new Error(`${tagToStr(parent)} to contain SyntaxList, found ${SyntaxKind[syntaxList.kind]}`);
     }
 
     const expectedTypes = [
-        ts.SyntaxKind.JsxText, ts.SyntaxKind.JsxExpression, ts.SyntaxKind.JsxElement,
-        ts.SyntaxKind.JsxSelfClosingElement, ts.SyntaxKind.JsxFragment
+        SyntaxKind.JsxText, SyntaxKind.JsxExpression, SyntaxKind.JsxElement,
+        SyntaxKind.JsxSelfClosingElement, SyntaxKind.JsxFragment
     ];
     const mismatches = syntaxList.getChildren()
         .filter(child => !expectedTypes.includes(child.kind))
-        .map(child => ts.SyntaxKind[child.kind]);
+        .map(child => SyntaxKind[child.kind]);
 
     if (mismatches.length > 0) {
         throw new Error('Unexpected type(s) in syntax list: ' + mismatches.join(', '));
     }
 
     // Safe cast, we checked it
-    return syntaxList.getChildren() as ts.JsxChild[];
+    return syntaxList.getChildren() as JsxChild[];
 }
 
 // Create the expression given after the colon (:) in the conditional expression
-function createWhenFalseExpression(prevBranch: ts.JsxElement, ctx: ts.TransformationContext, node: ts.Node): ts.Expression {
+function createWhenFalseExpression(prevBranch: JsxElement, ctx: TransformationContext, node: Node): Expression {
     if (isJsxParent(prevBranch.parent)) {
         const nextBranch = getNextBranch(prevBranch.parent, prevBranch);
         if (nextBranch) {
@@ -212,7 +231,7 @@ function createWhenFalseExpression(prevBranch: ts.JsxElement, ctx: ts.Transforma
     return ctx.factory.createNull();
 }
 
-function getNextBranch(prevBranch: JsxParent, ifElem: ts.JsxElement) {
+function getNextBranch(prevBranch: JsxParent, ifElem: JsxElement) {
     const siblingNodes = getJsxChildren(prevBranch);
     let siblingIdx = siblingNodes.findIndex(child => child === ifElem);
     if (siblingIdx < 0) {
@@ -236,5 +255,5 @@ function getNextBranch(prevBranch: JsxParent, ifElem: ts.JsxElement) {
 }
 
 function tagToStr(parent: JsxParent) {
-    return ts.isJsxElement(parent) ? `<${parent.openingElement.tagName} />` : 'fragment';
+    return isJsxElement(parent) ? `<${parent.openingElement.tagName} />` : 'fragment';
 }
