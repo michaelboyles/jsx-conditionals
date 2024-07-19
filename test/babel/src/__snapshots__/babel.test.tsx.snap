@@ -1,129 +1,177 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Allow whitespace between if-else 1`] = `"Condition was false"`;
+exports[`Allow whitespace between if-else 1`] = `
+<div>
+  Condition was false
+</div>
+`;
 
 exports[`Consecutive Ifs 1`] = `
-[
+<div>
   <div>
     Child 1
-  </div>,
+  </div>
   <div>
     Child 2
-  </div>,
-]
+  </div>
+</div>
 `;
 
 exports[`Consecutive Ifs with Elses 1`] = `
-[
+<div>
   <div>
     Child 1
-  </div>,
+  </div>
   <div>
     Child 2
-  </div>,
-]
+  </div>
+</div>
 `;
 
 exports[`Else preceded by a comment 1`] = `
-[
+<div>
   <div>
     Child 1
-  </div>,
+  </div>
   <div>
     Child 2
-  </div>,
-]
+  </div>
+</div>
 `;
 
 exports[`Else where Else is used 1`] = `
-[
+<div>
   <div>
     Child 1
-  </div>,
+  </div>
   <div>
     Child 2
-  </div>,
-]
+  </div>
+</div>
 `;
 
-exports[`Else with empty JSX expression 1`] = `null`;
+exports[`Else with empty JSX expression 1`] = `<div />`;
 
 exports[`Else with multiple children 1`] = `
-[
+<div>
   <div>
     Child 1
-  </div>,
+  </div>
   <div>
     Child 2
-  </div>,
-]
+  </div>
+</div>
 `;
 
 exports[`ElseIf where only ElseIf passes 1`] = `
-[
+<div>
   <div>
     Child 1
-  </div>,
+  </div>
   <div>
     Child 2
-  </div>,
-]
+  </div>
+</div>
 `;
 
 exports[`ElseIf where only If passes 1`] = `
 <div>
-  Child 1
+  <div>
+    Child 1
+  </div>
 </div>
 `;
 
-exports[`Falsy if 1`] = `null`;
+exports[`Falsy if 1`] = `<div />`;
 
 exports[`If and ElseIf both pass 1`] = `
 <div>
-  Child 1
+  <div>
+    Child 1
+  </div>
 </div>
 `;
 
-exports[`If with empty JSX expression 1`] = `null`;
+exports[`If with empty JSX expression 1`] = `<div />`;
 
-exports[`If with string literal condition 1`] = `"Condition is true"`;
-
-exports[`Multiple ElseIfs 1`] = `
-<div>
-  Child 1
-</div>
-`;
-
-exports[`Negative if inside div 1`] = `<div />`;
-
-exports[`Negative if inside fragment renders nothing 1`] = `null`;
-
-exports[`Negative if with evaluated condition 1`] = `<div />`;
-
-exports[`Nested if 1`] = `"Both conditions are true"`;
-
-exports[`Nested if-else 1`] = `
-<div>
-  1st condition is true but 2nd condition is false
-</div>
-`;
-
-exports[`Positive if 1`] = `"Condition is true"`;
-
-exports[`Positive if inside div 1`] = `
+exports[`If with string literal condition 1`] = `
 <div>
   Condition is true
 </div>
 `;
 
-exports[`Positive if inside fragment 1`] = `"Condition is true"`;
-
-exports[`Positive if with evaluated condition 1`] = `"Condition is true"`;
-
-exports[`Simple if-else 1`] = `
+exports[`Multiple ElseIfs 1`] = `
 <div>
-  Condition is false
+  <div>
+    Child 1
+  </div>
 </div>
 `;
 
-exports[`Truthy if 1`] = `"Condition is true"`;
+exports[`Negative if inside div 1`] = `
+<div>
+  <div />
+</div>
+`;
+
+exports[`Negative if inside fragment renders nothing 1`] = `<div />`;
+
+exports[`Negative if with evaluated condition 1`] = `
+<div>
+  <div />
+</div>
+`;
+
+exports[`Nested if 1`] = `
+<div>
+  Both conditions are true
+</div>
+`;
+
+exports[`Nested if-else 1`] = `
+<div>
+  <div>
+    1st condition is true but 2nd condition is false
+  </div>
+</div>
+`;
+
+exports[`Positive if 1`] = `
+<div>
+  Condition is true
+</div>
+`;
+
+exports[`Positive if inside div 1`] = `
+<div>
+  <div>
+    Condition is true
+  </div>
+</div>
+`;
+
+exports[`Positive if inside fragment 1`] = `
+<div>
+  Condition is true
+</div>
+`;
+
+exports[`Positive if with evaluated condition 1`] = `
+<div>
+  Condition is true
+</div>
+`;
+
+exports[`Simple if-else 1`] = `
+<div>
+  <div>
+    Condition is false
+  </div>
+</div>
+`;
+
+exports[`Truthy if 1`] = `
+<div>
+  Condition is true
+</div>
+`;
