@@ -1,5 +1,5 @@
-import { types, PluginObj, NodePath } from '@babel/core';
-import { JSXElement, Node, JSXFragment, Expression } from '@babel/types';
+import type { types, PluginObj, NodePath } from '@babel/core';
+import type { JSXElement, Node, JSXFragment, Expression } from '@babel/types';
 
 type JSXParent = JSXElement | JSXFragment;
 function isJsxParent(node: Node): node is JSXParent {

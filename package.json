@@ -1,12 +1,10 @@
 {
   "name": "jsx-conditionals",
   "version": "1.1.0",
-  "description": "Add if-else statements to JSX with TypeScript compiler transforms",
+  "description": "Add if-else statements to JSX with compiler transforms",
   "scripts": {
-    "build": "tsc && node build/copy-to-dist.ts",
-    "jest": "jest",
-    "test": "jest --clearCache && jest",
-    "prepack": "node ../build/message.ts"
+    "build": "tsc && node build/copy-to-dist.js",
+    "prepack": "node ../build/message.js"
   },
   "keywords": [
     "react",
@@ -22,15 +20,16 @@
   "files": [
     "index.d.ts",
     "index.js",
-    "transform.js"
+    "transform.js",
+    "babel.js"
   ],
   "main": "index.js",
   "types": "index.d.ts",
-  "dependencies": {
-    "@babel/core": "^7.24.7",
-    "react": "^18.3.1"
+  "peerDependencies": {
+    "react": ">= 15.0.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.24.9",
     "@babel/types": "^7.24.7",
     "@types/babel__core": "^7.20.5",
     "@types/node": "^20.14.9",
