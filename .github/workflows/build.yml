@@ -1,5 +1,3 @@
-name: Build with npm
-
 on:
   push:
     branches: [ develop ]
@@ -18,11 +16,15 @@ jobs:
         node-version: 20
     - run: npm ci
     - run: npm run build
-    - run: npm ci
+    - name: Babel test setup
+      run: npm ci
       working-directory: test/babel
-    - run: npm test
+    - name: Babel test
+      run: npm test
       working-directory: test/babel
-    - run: npm ci
+    - name: TS test setup
+      run: npm ci
       working-directory: test/ts-jest
-    - run: npm test
+    - name: TS test
+      run: npm test
       working-directory: test/ts-jest
