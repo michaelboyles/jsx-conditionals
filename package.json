@@ -1,12 +1,10 @@
 {
   "name": "jsx-conditionals",
-  "version": "1.1.0",
-  "description": "Add if-else statements to JSX with TypeScript compiler transforms",
+  "version": "1.2.0",
+  "description": "Add if-else statements to JSX with compiler transforms",
   "scripts": {
-    "build": "tsc && node build/copy-to-dist.ts",
-    "jest": "jest",
-    "test": "jest --clearCache && jest",
-    "prepack": "node ../build/message.ts"
+    "build": "tsc && node build/copy-to-dist.js",
+    "prepack": "node ../build/message.js"
   },
   "keywords": [
     "react",
@@ -22,32 +20,20 @@
   "files": [
     "index.d.ts",
     "index.js",
-    "transform.js"
+    "transform.js",
+    "babel.js"
   ],
   "main": "index.js",
   "types": "index.d.ts",
-  "dependencies": {
-    "react": "^17.0.2"
+  "peerDependencies": {
+    "react": ">= 15.0.0"
   },
   "devDependencies": {
-    "@types/jest": "^27.4.1",
-    "@types/node": "^17.0.23",
-    "@types/react": "^17.0.11",
-    "jest": "^27.5.1",
-    "react-test-renderer": "^17.0.2",
-    "ts-jest": "^27.1.4",
-    "ts-node": "^10.7.0",
-    "ttypescript": "^1.5.12",
-    "typescript": "^4.6.3"
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "globals": {
-      "ts-jest": {
-        "compiler": "ttypescript",
-        "tsconfig": "./src/test/tsconfig-test.json"
-      }
-    }
+    "@babel/core": "^7.24.9",
+    "@babel/types": "^7.24.7",
+    "@types/babel__core": "^7.20.5",
+    "@types/node": "^20.14.9",
+    "@types/react": "^18.3.3",
+    "typescript": "^5.5.3"
   }
 }

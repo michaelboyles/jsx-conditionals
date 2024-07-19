@@ -1,7 +1,7 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { ConditionalComponent } from './ConditionalComponent';
 
 const container = document.getElementById('root');
-
-ReactDOM.render(<ConditionalComponent />, container);
+const root = createRoot(container!);
+root.render(<ConditionalComponent />);

@@ -1,0 +1,20 @@
+{
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "up": "vitest -u"
+  },
+  "dependencies": {
+    "react": "^18.3.1"
+  },
+  "devDependencies": {
+    "@babel/plugin-syntax-typescript": "^7.24.7",
+    "@testing-library/react": "^16.0.0",
+    "@types/node": "^20.14.9",
+    "@types/react": "^18.3.3",
+    "jsdom": "^24.1.0",
+    "vite": "^5.3.4",
+    "vite-plugin-babel": "^1.2.0",
+    "vitest": "^2.0.3"
+  }
+}

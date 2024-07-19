@@ -1,8 +1,9 @@
 {
-    "files": ["src/index.tsx", "src/transform.ts"],
+    "files": ["src/index.tsx", "src/transform.ts", "src/babel.ts"],
     "compilerOptions":
     {
-        "jsx": "react",
+        "jsx": "react-jsx",
+        "strict": true,
         "declaration": true,
         "outDir": "dist",
         "removeComments": true
