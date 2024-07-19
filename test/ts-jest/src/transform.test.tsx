@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as renderer from 'react-test-renderer';
-import { Else, ElseIf, If } from '../../../src';
+import { If, Else, ElseIf } from '../../../dist';
 
 const NOT_RENDERED = 'THIS TEXT SHOULD NOT BE RENDERED!';
 
@@ -264,6 +264,7 @@ it('Consecutive Ifs with Elses', () => {
 
 it('If with empty JSX expression', () => {
     const tree = renderer
+        // @ts-ignore
         .create(<If condition={false}>{}</If>)
         .toJSON();
     expect(tree).toMatchSnapshot();
@@ -273,7 +274,8 @@ it('Else with empty JSX expression', () => {
     const tree = renderer
         .create(
             <>
-                <If condition={false}>{}</If>
+                <If condition={false}>{ NOT_RENDERED }</If>
+                {/* @ts-ignore */}
                 <Else>{}</Else>
             </>
         )
