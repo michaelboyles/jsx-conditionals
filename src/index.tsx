@@ -1,11 +1,11 @@
-import * as React from 'react';
+import { ReactNode } from 'react';
 
 const warning = " is a special component which is expected to be removed by transform at compile-time. If you're"
      + " seeing this message then the transform wasn't successful";
 
 export interface IfProps {
-    condition: any;
-    children: React.ReactNode
+    condition: any
+    children: ReactNode
 }
 
 export const If = (props: IfProps) => {
@@ -25,7 +25,7 @@ export const ElseIf = (props: IfProps) => {
 }
 
 export interface ElseProps {
-    children: React.ReactNode
+    children: ReactNode
 }
 
 export const Else = (props: ElseProps) => {

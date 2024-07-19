@@ -94,11 +94,12 @@ export default function({ types: t }: Bable): PluginObj {
         if (!conditionAttr) throw new Error(`Missing '${attrName}' property`);
         if (conditionAttr.type !== 'JSXAttribute') throw new Error("Impossible");
 
+        if (!conditionAttr.value) return t.booleanLiteral(true);
         if (conditionAttr.value.type !== 'JSXExpressionContainer') {
             return conditionAttr.value;
         }
         if (conditionAttr.value.expression.type === 'JSXEmptyExpression') {
-            return t.booleanLiteral(true); // Not sure about it
+            return t.booleanLiteral(true);
         }
         return conditionAttr.value.expression;
     }

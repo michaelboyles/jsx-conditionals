@@ -9,11 +9,11 @@ function isJsxParent(node: ts.Node): node is JsxParent {
 export default function(_program: ts.Program, _pluginOptions: object) {
     return (ctx: ts.TransformationContext) => {
         return (sourceFile: ts.SourceFile) => {
-            function visitor(node: ts.Node): ts.Node {
+            function visitor(node: ts.Node): ts.Node | undefined {
                 try {
                     if (ts.isImportDeclaration(node)) {
                         const pkg = node.moduleSpecifier as ts.StringLiteral;
-                        if (pkg.text === 'jsx-conditionals') return null; // Remove the imports
+                        if (pkg.text === 'jsx-conditionals') return undefined; // Remove the imports
                     }
                     if (isJsxParent(node)) {
                         checkForOrphanedNodes(node);
@@ -27,10 +27,10 @@ export default function(_program: ts.Program, _pluginOptions: object) {
                             throw new Error(nodeToString(node) + " is used a top-level node and has no associated <If> condition");
                         }
                         // We already processed the <Else> and <ElseIf> clauses so here we can just erase them
-                        return null;
+                        return undefined;
                     }
                 }
-                catch (err) {
+                catch (err: any) {
                     if (err.message) {
                         err.message = `${err.message}\r\nIn file ${sourceFile.fileName}\r\nAt node ${node.getText()}`;
                     }
@@ -47,7 +47,7 @@ function createTernary(ctx: ts.TransformationContext, prevBranch: ts.JsxElement)
     return ctx.factory.createJsxExpression(
         undefined,
         ctx.factory.createConditionalExpression(
-            getConditionExpression(prevBranch),
+            getConditionExpression(ctx, prevBranch),
             ctx.factory.createToken(ts.SyntaxKind.QuestionToken),
             createTernaryOperand(ctx, prevBranch, getJsxChildren(prevBranch)),
             ctx.factory.createToken(ts.SyntaxKind.ColonToken),
@@ -111,9 +111,9 @@ function isPossibleCommentNode(node: ts.Node): boolean {
         && node.getChildCount() == 2; // '{' and '}'
 }
 
-function getConditionExpression(jsxElem: ts.JsxElement): ts.Expression {
+function getConditionExpression(ctx: ts.TransformationContext, jsxElem: ts.JsxElement): ts.Expression {
     const attrName = 'condition';
-    let conditionAttr: ts.JsxAttribute = null;
+    let conditionAttr: (ts.JsxAttribute | null) = null;
 
     jsxElem.openingElement.attributes.forEachChild(attr => {
         if (ts.isJsxAttribute(attr) && attr.name.getText() === attrName) {
@@ -126,8 +126,14 @@ function getConditionExpression(jsxElem: ts.JsxElement): ts.Expression {
         throw new Error(`Missing '${attrName}' property`);
     }
 
-    const initializer = conditionAttr.initializer;
+    const initializer = (conditionAttr as (ts.JsxAttribute)).initializer;
+    if (!initializer) {
+        return ctx.factory.createToken(ts.SyntaxKind.TrueKeyword);
+    }
     if (ts.isJsxExpression(initializer)) {
+        if (!initializer.expression) {
+            return ctx.factory.createToken(ts.SyntaxKind.TrueKeyword);
+        }
         return initializer.expression;
     }
     return initializer;

@@ -94,6 +94,12 @@ exports[`If and ElseIf both pass 1`] = `
 
 exports[`If with empty JSX expression 1`] = `<div />`;
 
+exports[`If with no initializer condition 1`] = `
+<div>
+  Condition is de-facto true
+</div>
+`;
+
 exports[`If with string literal condition 1`] = `
 <div>
   Condition is true

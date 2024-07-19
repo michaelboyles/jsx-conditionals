@@ -243,3 +243,9 @@ it('If with string literal condition', () => {
     const { container } = render(<If condition="true">Condition is true</If>)
     expect(container).toMatchSnapshot();
 });
+
+// It's dumb and I see no reason to do it, but it should be handled
+it('If with no initializer condition', () => {
+    const { container } = render(<If condition>Condition is de-facto true</If>)
+    expect(container).toMatchSnapshot();
+});
